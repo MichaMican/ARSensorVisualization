@@ -200,7 +200,7 @@ const arrowCloud = createArrowCloud(root, 3000)
 
 updatePositioning(root, 'data/positioning.json')
 
-loadModel('data/model/', "kokille.obj", "kokille.mtl", (object) => {
+loadModel('data/model/', 'kokille.obj', 'kokille.mtl', (object) => {
 	root.add(object)
 
 	updatePositioning(object, 'data/kokilleTransformation.json')
@@ -261,7 +261,7 @@ function moveArrowToVector(arrow, vector) {
 
 setInterval(async () => {
 	try {
-		const result = await fetch('http://192.168.0.54:5000/api/data')
+		const result = await fetch('http://192.168.0.54:8080/vectors')
 		positions = await result.json()
 	} catch (e) {
 		positions = []
