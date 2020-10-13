@@ -260,6 +260,12 @@ function moveArrowToVector(arrow, vector) {
 }
 
 setInterval(async () => {
-	const result = await fetch('http://192.168.0.54:5000/api/data')
-	positions = await result.json()
+	try {
+		const result = await fetch('https://192.168.0.54:5001/api/data')
+		positions = await result.json()
+	} catch (e) {
+		positions = []
+
+		console.log(e)
+	}
 }, 500)
