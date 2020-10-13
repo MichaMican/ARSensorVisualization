@@ -196,7 +196,7 @@ const markerRoot = createMarkerRoot(scene, 'data/hiro.patt')
 
 const root = createGroup(markerRoot)
 
-const arrowCloud = createArrowCloud(root, 3000)
+const arrowCloud = createArrowCloud(root, 10000)
 
 updatePositioning(root, 'data/positioning.json')
 
