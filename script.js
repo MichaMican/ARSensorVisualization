@@ -261,7 +261,7 @@ function moveArrowToVector(arrow, vector) {
 
 setInterval(async () => {
 	try {
-		const result = await fetch('http://192.168.0.54:8080/vectors')
+		const result = await fetch('https://ardatatest.azurewebsites.net/api/data')
 		positions = await result.json()
 	} catch (e) {
 		positions = []
