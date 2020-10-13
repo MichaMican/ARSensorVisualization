@@ -135,7 +135,24 @@ function moveArrow(arrow, pos, dir) {
 	arrow.setLength(dirVec.length())
 }
 
-function update() {
+function loadModel(basePath, modelPath, texturePath, callback) {
+	let mtlLoader = new THREE.MTLLoader()
+	mtlLoader.setTexturePath(basePath)
+	mtlLoader.setPath(basePath)
+	mtlLoader.load(texturePath, (materials) => {
+		materials.preload()
+
+		let objLoader = new THREE.OBJLoader()
+		objLoader.setMaterials(materials)
+		objLoader.setPath(basePath)
+		objLoader.load(modelPath, callback/*, onProgress, onError */)
+	})
+}
+
+function update(updateCallback) {
+	// run update callback
+	updateCallback()
+
 	// update artoolkit on every frame
 	if (arToolkitSource.ready) {
 		arToolkitContext.update(arToolkitSource.domElement);
@@ -146,7 +163,7 @@ function render() {
 	renderer.render(scene, camera);
 }
 
-function run() {
+function run(updateCallback) {
 	const clock = new THREE.Clock()
 	var deltaTime = 0
 	var totalTime = 0
@@ -155,36 +172,12 @@ function run() {
 		requestAnimationFrame(animate);
 		deltaTime = clock.getDelta();
 		totalTime += deltaTime;
-		update();
+		update(updateCallback);
 		render();
 	}
 
 	animate()
 }
-
-
-function createArrowCloud(root, count, color) {
-	const arrowCloud = []
-
-	if (color === undefined) color = 0x884400
-
-	for (let i = 0; i < count; i++) {
-		const x = (i % 10) / 10 - 0.5
-		const z = (Math.floor(i / 10) % 10) / 10 - 0.5
-		const yStart = Math.floor(i / 100) / 10
-
-		const start = new THREE.Vector3(x, yStart, z)
-		const direction = new THREE.Vector3(0, 0.1, 0)
-
-		const arrow = new THREE.ArrowHelper(direction, start, direction.length(), color)
-
-		arrowCloud.push(arrow)
-		root.add(arrow)
-	}
-
-	return arrowCloud
-}
-
 
 const scene = new THREE.Scene()
 
@@ -203,12 +196,56 @@ const markerRoot = createMarkerRoot(scene, 'data/hiro.patt')
 
 const root = createGroup(markerRoot)
 
-const arrows = createArrowCloud(root, 3000)
+const arrowCloud = createArrowCloud(root, 3000)
 
 updatePositioning(root, 'data/positioning.json')
 
-run()
+loadModel('data/model/', "kokille.obj", "kokille.mtl", (object) => {
+	root.add(object)
 
+	updatePositioning(object, 'data/kokilleTransformation.json')
+})
+
+let positions = []
+let lastPositions = positions
+
+run(() => {
+	const currentPositions = positions
+	const arrowCount = arrowCloud.length
+
+	for (let i = 0; i < arrowCount; i++) {
+		const arrow = arrowCloud[i]
+		const position = currentPositions[i]
+
+		if (position) {
+			moveArrowToVector(arrow, position)
+
+			arrow.visible = true
+		} else {
+			arrow.visible = false
+		}
+	}
+})
+
+function createArrowCloud(root, count, color) {
+	const arrowCloud = []
+
+	if (color === undefined) color = 0x884400
+
+	for (let i = 0; i < count; i++) {
+		const start = new THREE.Vector3(0, 0, 0)
+		const direction = new THREE.Vector3(0, 0.1, 0)
+
+		const arrow = new THREE.ArrowHelper(direction, start, direction.length(), color)
+
+		arrow.visible = false
+
+		arrowCloud.push(arrow)
+		root.add(arrow)
+	}
+
+	return arrowCloud
+}
 
 function moveArrowToVector(arrow, vector) {
 	moveArrow(arrow, {
@@ -222,35 +259,7 @@ function moveArrowToVector(arrow, vector) {
 	})
 }
 
-
-var iteration = -2
-
-setInterval(() => {
-	iteration++
-
-	for (arrow of arrows) {
-		moveArrow(arrow, arrow.position, {
-			x: iteration / 100,
-			y: 0.1,
-			z: iteration / 100
-		})
-	}
+setInterval(async () => {
+	const result = await fetch('http://192.168.0.54:5000/api/data')
+	positions = await result.json()
 }, 500)
-
-
-const modelPath = 'data/model/'
-
-let mtlLoader = new THREE.MTLLoader()
-mtlLoader.setTexturePath(modelPath)
-mtlLoader.setPath(modelPath)
-mtlLoader.load("kokille.mtl", (materials) => {
-	materials.preload()
-
-    let objLoader = new THREE.OBJLoader()
-    objLoader.setMaterials(materials)
-    objLoader.setPath(modelPath)
-    objLoader.load("kokille.obj", (object) => {
-        object.position.y = 0
-		root.add(object)
-    }/*, onProgress, onError */)
-})
