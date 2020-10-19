@@ -1,4 +1,14 @@
-function createArrowCloud(parent, count, color) {
+declare const THREE: any
+import { ArWrapper } from './ArWrapper'
+import {
+	createRenderer,
+	createGroup,
+	updatePositioning,
+	loadModel,
+	moveArrow
+} from './ThreeUtil'
+
+function createArrowCloud(parent, count, color?) {
 	const arrowCloud = []
 
 	if (color === undefined) color = 0x884400

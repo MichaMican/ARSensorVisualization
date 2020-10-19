@@ -1,5 +1,11 @@
+declare const THREE: any
+declare const THREEx: any
 
-class ArWrapper {
+export class ArWrapper {
+	renderer: any
+	arToolkitSource: any
+	arToolkitContext: any
+
 	constructor(renderer, camera, cameraParametersUrl) {
 		this.renderer = renderer
 

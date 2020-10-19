@@ -1,4 +1,6 @@
-function createRenderer(parentElement) {
+declare const THREE: any
+
+export function createRenderer(parentElement) {
 	const renderer = new THREE.WebGLRenderer({
 		antialias : true,
 		alpha: true
@@ -16,14 +18,14 @@ function createRenderer(parentElement) {
 	return renderer
 }
 
-function createGroup(parent) {
+export function createGroup(parent) {
 	const group = new THREE.Group()
 	parent.add(group)
 
 	return group
 }
 
-function updatePositioning(root, positioningUrl) {
+export function updatePositioning(root, positioningUrl) {
 	fetch(positioningUrl)
 		.then((response) => {
 			return response.json()
@@ -40,7 +42,7 @@ function updatePositioning(root, positioningUrl) {
 		})
 }
 
-function defaultVector(vector, defaults) {
+export function defaultVector(vector, defaults) {
 	vector = vector || {}
 	if (vector.x === undefined || vector.x === null) vector.x = defaults.x
 	if (vector.y === undefined || vector.y === null) vector.y = defaults.y
@@ -48,11 +50,11 @@ function defaultVector(vector, defaults) {
 	return vector
 }
 
-function toThreeVector(vector) {
+export function toThreeVector(vector) {
 	return new THREE.Vector3(vector.x, vector.y, vector.z)
 }
 
-function translate(object, vector) {
+export function translate(object, vector) {
 	vector = defaultVector(vector, {x: 0, y: 0, z: 0})
 
 	object.translateX(vector.x)
@@ -60,7 +62,7 @@ function translate(object, vector) {
 	object.translateZ(vector.z)
 }
 
-function rotate(object, vector) {
+export function rotate(object, vector) {
 	vector = defaultVector(vector, {x: 0, y: 0, z: 0})
 
 	object.rotateX(vector.x)
@@ -68,7 +70,7 @@ function rotate(object, vector) {
 	object.rotateZ(vector.z)
 }
 
-function scale(object, vector) {
+export function scale(object, vector) {
 	vector = defaultVector(vector, {x: 1, y: 1, z: 1})
 
 	object.scale.x = vector.x
@@ -76,7 +78,7 @@ function scale(object, vector) {
 	object.scale.z = vector.z
 }
 
-function moveArrow(arrow, pos, dir) {
+export function moveArrow(arrow, pos, dir) {
 	pos = defaultVector(pos, {x: 0, y: 0, z: 0})
 	dir = defaultVector(dir, {x: 1, y: 1, z: 1})
 
@@ -93,7 +95,7 @@ function moveArrow(arrow, pos, dir) {
 	}
 }
 
-function loadModel(basePath, modelPath, texturePath, callback) {
+export function loadModel(basePath, modelPath, texturePath, callback) {
 	let mtlLoader = new THREE.MTLLoader()
 	mtlLoader.setTexturePath(basePath)
 	mtlLoader.setPath(basePath)
