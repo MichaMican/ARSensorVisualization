@@ -1,4 +1,5 @@
 declare const THREE: any
+import { initGui } from './gui'
 import { ArWrapper } from './ArWrapper'
 import {
 	createRenderer,
@@ -113,3 +114,5 @@ setInterval(async () => {
 		console.log(e)
 	}
 }, 500)
+
+initGui()
