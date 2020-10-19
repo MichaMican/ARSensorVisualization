@@ -9,5 +9,18 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\data\camera_para.dat" />
+    <None Include="wwwroot\data\hiro.patt" />
+    <None Include="wwwroot\data\model\kokille.mtl" />
+    <None Include="wwwroot\data\model\kokille.obj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
 
 </Project>
