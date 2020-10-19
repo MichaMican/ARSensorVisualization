@@ -38,9 +38,13 @@ namespace backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            } 
+            else
+            {
+                //Add Https Redirection only in release build
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
 
             app.UseStaticFiles();
 
