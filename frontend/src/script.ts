@@ -51,19 +51,19 @@ scene.add(ambientLight)
 
 const renderer = createRenderer(document.body)
 
-const arWrapper = new ArWrapper(renderer, camera, 'data/camera_para.dat')
-const markerRoot = arWrapper.createMarkerRoot(scene, 'data/hiro.patt')
+const arWrapper = new ArWrapper(renderer, camera, '../data/camera_para.dat')
+const markerRoot = arWrapper.createMarkerRoot(scene, '../data/hiro.patt')
 
 const root = createGroup(markerRoot)
 
 const arrowCloud = createArrowCloud(root, 10000)
 
-updatePositioning(root, 'data/positioning.json')
+updatePositioning(root, '../data/positioning.json')
 
-loadModel('data/model/', 'kokille.obj', 'kokille.mtl', (kokille) => {
+loadModel('../data/model/', 'kokille.obj', 'kokille.mtl', (kokille) => {
 	root.add(kokille)
 
-	updatePositioning(kokille, 'data/kokilleTransformation.json')
+	updatePositioning(kokille, '../data/kokilleTransformation.json')
 })
 
 
