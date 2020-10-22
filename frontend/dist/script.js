@@ -309,7 +309,7 @@ const camera = new THREE.Camera();
 scene.add(camera);
 const ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
 scene.add(ambientLight);
-const renderer = ThreeUtil_1.createRenderer(document.body);
+const renderer = ThreeUtil_1.createRenderer(document.getElementById("canvas"));
 const arWrapper = new ArWrapper_1.ArWrapper(renderer, camera, 'data/camera_para.dat');
 const markerRoot = arWrapper.createMarkerRoot(scene, 'data/hiro.patt');
 const root = ThreeUtil_1.createGroup(markerRoot);

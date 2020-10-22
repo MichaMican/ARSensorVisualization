@@ -50,7 +50,7 @@ scene.add(camera)
 const ambientLight = new THREE.AmbientLight(0xcccccc, 0.5)
 scene.add(ambientLight)
 
-const renderer = createRenderer(document.body)
+const renderer = createRenderer(document.getElementById("canvas"))
 
 const arWrapper = new ArWrapper(renderer, camera, 'data/camera_para.dat')
 const markerRoot = arWrapper.createMarkerRoot(scene, 'data/hiro.patt')

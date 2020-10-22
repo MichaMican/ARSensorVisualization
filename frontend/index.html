@@ -19,11 +19,77 @@
 	<script src="threex/threex-artoolkitcontext.js"></script>
 	<script src="threex/threex-arbasecontrols.js"></script>
 	<script src="threex/threex-armarkercontrols.js"></script>
+
+	<style>
+		.content {
+			position: relative;
+			z-index: 100;
+		}
+
+		.background {
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: -100;
+		}
+
+		.slider {
+			-webkit-appearance: none;
+			height: 25px;
+			width: 90vh;
+			background: #d3d3d3;
+			outline: none;
+			opacity: 0.7;
+			-webkit-transition: .2s;
+			transition: opacity .2s;
+			-webkit-transform: rotate(270deg);
+			-moz-transform: rotate(270deg);
+			-o-transform: rotate(270deg);
+			-ms-transform: rotate(270deg);
+			transform: rotate(270deg);
+			margin-top: 45vh;
+			margin-left: calc(100% - 47vh);
+		}
+
+		/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+		.slider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			/* Override default look */
+			appearance: none;
+			width: 25px;
+			/* Set a specific slider handle width */
+			height: 25px;
+			/* Slider handle height */
+			background: #4CAF50;
+			/* Green background */
+			cursor: pointer;
+			/* Cursor on hover */
+		}
+
+		.slider::-moz-range-thumb {
+			width: 25px;
+			/* Set a specific slider handle width */
+			height: 25px;
+			/* Slider handle height */
+			background: #4CAF50;
+			/* Green background */
+			cursor: pointer;
+			/* Cursor on hover */
+		}
+
+		div.sliderWrapper {
+		}
+	</style>
 </head>
 
 <body style='margin : 0; overflow: hidden; font-family: Monospace'>
-	<input id="slider" type="range" min="1" max="100" value="50">
-	<div id="display">50</div>
+	<div class="content">
+		<div class="sliderWrapper">
+			<input id="slider" class="slider" type="range" min="1" max="100" value="50" orient="vertical">
+			<div id="display">50</div>
+		</div>
+	</div>
+	<div class="background" id="canvas"></div>
 </body>
 
 </html>
