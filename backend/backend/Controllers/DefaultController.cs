@@ -14,16 +14,28 @@ namespace backend.Controllers
     public class DefaultController : ControllerBase
     {
         Random rnd = new Random();
+        private const int MAX_VECTOR = 10000;
 
         [HttpGet("data")]
-        public ActionResult<List<VectorDto>> GetVectorCollection()
+        public ActionResult<List<VectorDto>> GetVectorCollection(int limit = MAX_VECTOR, int offset = 0)
         {
+
+            if (limit + offset > MAX_VECTOR)
+            {
+                if (offset > MAX_VECTOR)
+                {
+                    return BadRequest("There are a maximum of 10000 Vectors");
+                }
+
+                limit = MAX_VECTOR - offset;
+            }
+
             var returnList = new List<VectorDto>();
-            var count = 10000;
+            var count = limit;
 
             double vectorLength = rnd.Next(0, 10) / 10f;
 
-            for(int i = 0; i < count; i++)
+            for (int i = offset; i < count + offset; i++)
             {
                 var vector = new VectorDto()
                 {
