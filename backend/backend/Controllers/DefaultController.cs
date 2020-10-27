@@ -17,25 +17,15 @@ namespace backend.Controllers
         private const int MAX_VECTOR = 10000;
 
         [HttpGet("data")]
-        public ActionResult<List<VectorDto>> GetVectorCollection(int limit = MAX_VECTOR, int offset = 0)
+        public ActionResult<List<VectorDto>> GetVectorCollection(int limit = MAX_VECTOR, int offset = 0, int? minY = null, int? maxY = null)
         {
 
-            if (limit + offset > MAX_VECTOR)
-            {
-                if (offset > MAX_VECTOR)
-                {
-                    return BadRequest("There are a maximum of 10000 Vectors");
-                }
-
-                limit = MAX_VECTOR - offset;
-            }
-
             var returnList = new List<VectorDto>();
-            var count = limit;
+            var count = MAX_VECTOR;
 
             double vectorLength = rnd.Next(0, 10) / 10f;
 
-            for (int i = offset; i < count + offset; i++)
+            for (int i = 0; i < count; i++)
             {
                 var vector = new VectorDto()
                 {
@@ -50,7 +40,35 @@ namespace backend.Controllers
                 returnList.Add(vector);
             }
 
-            Response.Headers.Add("YOLO", "You Only live once du kek");
+            if(minY != null && maxY != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.y >= minY && vector.y <= maxY; }).ToList();
+            }
+            else if(minY != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.y >= minY; }).ToList();
+            }
+            else if(maxY != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.y <= maxY; }).ToList();
+            }
+            
+            if(offset != 0)
+            {
+                if(offset >= returnList.Count)
+                {
+                    returnList.Clear();
+                }
+                else
+                {
+                    returnList.RemoveRange(0, offset);
+                }
+            }
+
+            if(returnList.Count > limit)
+            {
+                returnList.RemoveRange(limit, returnList.Count - limit);
+            }
 
             return returnList;
         }
