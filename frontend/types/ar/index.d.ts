@@ -10,7 +10,7 @@ declare module 'ar' {
 	class ArToolkitSource {
 		parameters: ArSourceParameters
 
-		ready: boolean
+		readonly ready: boolean
 		domElement?: HTMLVideoElement | HTMLImageElement | null
 
 		constructor(parameters: ArSourceParameters)
@@ -24,14 +24,13 @@ declare module 'ar' {
 		): this
 
 
-		hasMobileTorch(): boolean
-		
-		/**
-		 * Toggle the flash/torch of the mobile fun if applicable.
-		 * @see Great post about it {@link https://www.oberhofer.co/mediastreamtrack-and-its-capabilities/}
-		 */
-		toggleMobileTorch(): void
-
+		hasMobileTorch(): this is {
+			/**
+			 * Toggle the flash/torch of the mobile fun if applicable.
+			 * @see Great post about it {@link https://www.oberhofer.co/mediastreamtrack-and-its-capabilities/}
+			 */
+			toggleMobileTorch(): void
+		}
 
 		domElementWidth(): number
 		domElementHeight(): number
@@ -39,12 +38,6 @@ declare module 'ar' {
 		onResizeElement(): void
 
 		copyElementSizeTo(otherElement: HTMLElement): void
-
-		onResize(
-			arToolkitContext: ArToolkitContext,
-			renderer: Renderer,
-			camera: Camera
-		): void
 	}
 	
 	class ArToolkitContext extends EventDispatcher {
@@ -53,6 +46,8 @@ declare module 'ar' {
 		static baseURL: String
 
 		parameters: ArContextParameters
+
+		initialized: boolean
 
 		arController?: any
 		arucoContext?: any
@@ -63,13 +58,14 @@ declare module 'ar' {
 
 		/**
 		 * Create a default camera for this trackingBackend
+		 * @depricated
 		 * @param trackingBackend - the tracking to user
 		 * @return the created camera
 		 */
 		static createDefaultCamera(trackingBackend: String): Camera
 
-		init(onCompleted: () => any): void
-		update(srcElement: HTMLVideoElement | HTMLImageElement): Boolean
+		init(onCompleted?: () => any): void
+		update(srcElement: HTMLVideoElement | HTMLImageElement): boolean
 
 		addMarker(arMarkerControls: ArMarkerControls): void
 		removeMarker(arMarkerControls: ArMarkerControls): void
@@ -100,7 +96,7 @@ declare module 'ar' {
 		)
 
 		name(): string
-		update(): void
+		update: () => void
 		dispose(): void
 		
 		/**
@@ -109,7 +105,7 @@ declare module 'ar' {
 		 */
 		updateWithModelViewMatrix(
 			modelViewMatrix: Matrix4
-		): void
+		): boolean
 	}
 
 	interface ArSourceParameters {
@@ -153,7 +149,7 @@ declare module 'ar' {
 		/**
 		 * AR backend
 		 */
-		trackingBackend?: 'artoolkit' | 'aruco'
+		trackingBackend?: 'artoolkit'
 
 		/**
 		 * debug - true if one should display artoolkit debug canvas, false otherwise
@@ -194,15 +190,6 @@ declare module 'ar' {
 		 * the patternRatio inside the artoolkit marker - artoolkit only
 		 */
 		patternRatio?: Number
-
-		/**
-		 * Labeling mode for markers
-		 * 
-		 * black_region: Black bordered markers on a white background
-		 * 
-		 * white_region: White bordered markers on a black background
-		 */
-		labelingMode?: 'black_region' | 'white_region'
 
 		/**
 		 * enable image smoothing or not for canvas copy
