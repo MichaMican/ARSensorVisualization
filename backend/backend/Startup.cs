@@ -40,12 +40,12 @@ namespace backend
                 app.UseDeveloperExceptionPage();
             }
 
-            #if DEBUG
+#if DEBUG
                 Console.WriteLine("Skipping HttpsRedirection due to DEBUG run");
-            #else
-                //Add Https Redirection only in release build
-                app.UseHttpsRedirection();
-            #endif
+#else
+            //Add Https Redirection only in release build
+            app.UseHttpsRedirection();
+#endif
 
 
             app.UseStaticFiles();

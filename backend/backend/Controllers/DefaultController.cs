@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Text.Json;
 using System.Threading.Tasks;
 using backend.Models;
 using Microsoft.AspNetCore.Cors;
@@ -15,26 +17,86 @@ namespace backend.Controllers
     {
         Random rnd = new Random();
         private const int MAX_VECTOR = 10000;
+        private List<GravitationPointDto> gravitationPoints = new List<GravitationPointDto>();
 
+        public DefaultController()
+        {
+            gravitationPoints.Add(new GravitationPointDto()
+            {
+                x = -0.35,
+                y = 6,
+                z = 0,
+                force = 1
+            });
+            gravitationPoints.Add(new GravitationPointDto()
+            {
+                x = 0.2,
+                y = 5.5,
+                z = 0,
+                force = 1
+            });
+            gravitationPoints.Add(new GravitationPointDto()
+            {
+                x = 0,
+                y = 2,
+                z = 0,
+                force = 1
+            });
+        }
+
+        private VectorDto CalculateVectorForGravitationalPoint(VectorDto vector, GravitationPointDto gravitationPoint)
+        {
+            var vectorCpy = new VectorDto(vector);
+
+            double dx = gravitationPoint.x - vector.x;
+            double dy = gravitationPoint.y - vector.y;
+            double dz = gravitationPoint.z - vector.z;
+
+            double distance = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2) + Math.Pow(dz, 2));
+
+            double xForce = (gravitationPoint.force / (distance + 1)) * dx;
+            double yForce = (gravitationPoint.force / (distance + 1)) * dy;
+            double zForce = (gravitationPoint.force / (distance + 1)) * dz;
+
+            vectorCpy.xVec = vector.xVec + xForce;
+            vectorCpy.yVec = vector.yVec + yForce;
+            vectorCpy.zVec = vector.zVec + zForce;
+
+            return vectorCpy;
+        }
+
+        private VectorDto CalculateDirectionVectror(double x, double y, double z)
+        {
+            var defaultVector = new VectorDto()
+            {
+                x = x,
+                y = y,
+                z = z,
+                xVec = 0,
+                yVec = -1,
+                zVec = 0,
+            };
+
+            foreach(var gravPoint in gravitationPoints)
+            {
+                defaultVector = CalculateVectorForGravitationalPoint(defaultVector, gravPoint);
+            }
+
+            return defaultVector;
+
+        }
 
         private List<VectorDto> GenerateVectors(int vectorCount) {
 
             var returnList = new List<VectorDto>();
 
-            double vectorLength = rnd.Next(0, 10) / 10f;
-
             for (int i = 0; i < vectorCount; i++)
             {
-                var vector = new VectorDto()
-                {
-                    x = ((i % 10) / 10f - 0.5f),
-                    y = (Math.Floor(i / 100f) / 10f),
-                    z = ((Math.Floor(i / 10f) % 10) / 10f - 0.5f),
-                    xVec = vectorLength,
-                    yVec = vectorLength,
-                    zVec = vectorLength
-                };
+                double x = ((i % 10) / 10f - 0.5f);
+                double y = (Math.Floor(i / 100f) / 10f);
+                double z = ((Math.Floor(i / 10f) % 10) / 10f - 0.5f);
 
+                var vector = CalculateDirectionVectror(x, y, z);
                 returnList.Add(vector);
             }
 
