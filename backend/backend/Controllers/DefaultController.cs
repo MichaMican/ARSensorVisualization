@@ -20,26 +20,37 @@ namespace backend.Controllers
             _engine = new DefaultEngine();
         }
 
+        /*
+         * limit: max number of vectors returned
+         * n1: NormalVector X
+         * n2: NormalVector Y
+         * n3: NormalVector Z
+         * x: X value of point on Plain
+         * y: Y value of point on Plain
+         * z: Z value of point on Plain
+         * maxDist = 0.5: maximal Distance of returned vector bases to plain
+         */
         [HttpGet("data/v2")]
-        public ActionResult<List<VectorDto>> GetVectorCollectionV2(int limit = MAX_VECTOR, double[] normalVector = null, double[] pointOnPlane = null, double maxDist = 0.5)
+        public ActionResult<List<VectorDto>> GetVectorCollectionV2(int limit = MAX_VECTOR, double? n1 = null, double? n2 = null, double? n3 = null, double? x = null, double? y = null, double? z = null, double maxDist = 0.5)
         {
             var vectors = _engine.GenerateVectors(MAX_VECTOR);
 
-            if(normalVector != null && pointOnPlane != null)
+            if(n1.HasValue || n2.HasValue || n3.HasValue || x.HasValue || y.HasValue || z.HasValue)
             {
-                if(normalVector.Length != 3 || pointOnPlane.Length != 3)
+                //makes sure that all variables are set
+                if(!n1.HasValue || !n2.HasValue || !n3.HasValue || !x.HasValue || !y.HasValue || !z.HasValue)
                 {
-                    return BadRequest("Please specify a valid plainVector");
+                    return BadRequest("Please specify n1, n2, n3, x, y and z");
                 }
 
                 VectorDto plainVector = new VectorDto()
                 {
-                    x = pointOnPlane[0],
-                    y = pointOnPlane[1],
-                    z = pointOnPlane[2],
-                    xVec = normalVector[0],
-                    yVec = normalVector[1],
-                    zVec = normalVector[2]
+                    x = x.Value,
+                    y = y.Value,
+                    z = z.Value,
+                    xVec = n1.Value,
+                    yVec = n2.Value,
+                    zVec = n3.Value
                 };
                 vectors = _engine.FilterVectors(vectors, plainVector, 0.5);
             }
