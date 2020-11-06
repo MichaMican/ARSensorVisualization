@@ -1,0 +1,26 @@
+{
+  "name": "ar_sensor_frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ar.js": "AR-js-org/AR.js#3.3.1",
+    "three": "^0.122.0"
+  },
+  "devDependencies": {
+    "@webpack-cli/init": "^0.3.0",
+    "html-webpack-plugin": "^4.3.0",
+    "ts-loader": "^7.0.2",
+    "exports-loader": "^0.7.0",
+    "typescript": "^3.8.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
+  }
+}
