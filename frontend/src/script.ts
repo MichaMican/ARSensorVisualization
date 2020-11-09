@@ -1,6 +1,14 @@
-declare const THREE: any
 import { initGui } from './gui'
-import { ArWrapper } from './ArWrapper'
+import {
+	AmbientLight,
+	ArrowHelper as Arrow,
+	Camera,
+	Color,
+	Object3D,
+	Scene,
+	Vector3
+} from 'three'
+
 import {
 	createRenderer,
 	createGroup,
@@ -9,16 +17,21 @@ import {
 	moveArrow
 } from './ThreeUtil'
 
-function createArrowCloud(parent, count, color?) {
+import { ArWrapper } from './ArWrapper'
+
+
+function createArrowCloud(
+	parent: Object3D,
+	count: number,
+	color: Color | string | number = 0x88440
+) {
 	const arrowCloud = []
 
-	if (color === undefined) color = 0x884400
-
-	const start = new THREE.Vector3(0, 0, 0)
-	const direction = new THREE.Vector3(1, 1, 1)
+	const start = new Vector3(0, 0, 0)
+	const direction = new Vector3(1, 1, 1)
 
 	for (let i = 0; i < count; i++) {
-		const arrow = new THREE.ArrowHelper(direction, start, direction.length(), color)
+		const arrow = new Arrow(direction, start, direction.length(), color)
 		arrow.visible = false
 
 		arrowCloud.push(arrow)
@@ -28,13 +41,13 @@ function createArrowCloud(parent, count, color?) {
 	return arrowCloud
 }
 
-function run(updateCallback) {
+function run(updateCallback: () => void) {
 	function animate() {
 		requestAnimationFrame(animate)
 		
 		updateCallback()
 
-		arWrapper.update()
+		ar.update()
 
 		renderer.render(scene, camera)
 	}
@@ -42,18 +55,18 @@ function run(updateCallback) {
 	animate()
 }
 
-const scene = new THREE.Scene()
+const scene = new Scene()
 
-const camera = new THREE.Camera()
+const camera = new Camera()
 scene.add(camera)
 
-const ambientLight = new THREE.AmbientLight(0xcccccc, 0.5)
+const ambientLight = new AmbientLight(0xcccccc, 0.5)
 scene.add(ambientLight)
 
-const renderer = createRenderer(document.getElementById("canvas"))
+const renderer = createRenderer(document.getElementById("canvas")!)
 
-const arWrapper = new ArWrapper(renderer, camera, '../data/camera_para.dat')
-const markerRoot = arWrapper.createMarkerRoot(scene, '../data/hiro.patt')
+const ar = new ArWrapper(renderer, camera, '../data/camera_para.dat')
+const markerRoot = ar.createMarkerRoot(scene, '../data/hiro.patt')
 
 const root = createGroup(markerRoot)
 
@@ -67,24 +80,32 @@ loadModel('../data/model/', 'kokille.obj', 'kokille.mtl', (kokille) => {
 	updatePositioning(kokille, '../data/kokilleTransformation.json')
 })
 
+interface Line3 {
+	x?: Number,
+	y?: Number,
+	z?: Number,
+	xVec?: Number,
+	yVec?: Number,
+	zVec?: Number
+}
 
-let positions = []
-let lastPositions = positions
+let lines: Array<Line3> = []
+let lastLines: Array<Line3> = lines
 
 run(() => {
-	if (lastPositions !== positions) {
-		lastPositions = positions
+	if (lastLines !== lines) {
+		lastLines = lines
 
-		const currentPositions = positions
+		const currentLines = lines
 		const arrowCount = arrowCloud.length
 	
 		for (let i = 0; i < arrowCount; i++) {
 			const arrow = arrowCloud[i]
-			const position = currentPositions[i]
+			const line = currentLines[i]
 	
-			if (position) {
+			if (line) {
 				arrow.visible = true
-				moveArrowToVector(arrow, position)
+				moveArrowToLine(arrow, line)
 			} else {
 				arrow.visible = false
 			}
@@ -92,24 +113,28 @@ run(() => {
 	}
 })
 
-function moveArrowToVector(arrow, vector) {
+function moveArrowToLine(arrow: Arrow, line: Line3) {
 	moveArrow(arrow, {
-		x: vector.x,
-		y: vector.y,
-		z: vector.z
+		x: line.x,
+		y: line.y,
+		z: line.z
 	}, {
-		x: vector.xVec,
-		y: vector.yVec,
-		z: vector.zVec
+		x: line.xVec,
+		y: line.yVec,
+		z: line.zVec
 	})
 }
 
 setInterval(async () => {
 	try {
 		const result = await fetch('https://ardatatest.azurewebsites.net/api/data')
-		positions = await result.json()
+		const linesJSON = await result.json()
+
+		if (linesJSON instanceof Array) {
+			lines = linesJSON
+		}
 	} catch (e) {
-		positions = []
+		lines = []
 
 		console.log(e)
 	}

@@ -23,7 +23,7 @@ namespace backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(o => o.AddPolicy("MyPole", builder => {
+            services.AddCors(o => o.AddPolicy("AllowAnyOrigin", builder => {
                 builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
@@ -38,19 +38,21 @@ namespace backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            } 
-            else
-            {
-                //Add Https Redirection only in release build
-                app.UseHttpsRedirection();
             }
+
+#if DEBUG
+                Console.WriteLine("Skipping HttpsRedirection due to DEBUG run");
+#else
+            //Add Https Redirection only in release build
+            app.UseHttpsRedirection();
+#endif
 
 
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseCors("MyPole");
+            app.UseCors("AllowAnyOrigin");
 
             app.UseAuthorization();
 

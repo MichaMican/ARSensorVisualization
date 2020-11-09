@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using backend.Controllers.Engines;
+using backend.Interface;
 using backend.Models;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -13,32 +12,106 @@ namespace backend.Controllers
     [ApiController]
     public class DefaultController : ControllerBase
     {
-        Random rnd = new Random();
+        private const int MAX_VECTOR = 3200;
+        private IDefaultEngine _engine;
 
-        [HttpGet("data")]
-        public ActionResult<List<VectorDto>> GetVectorCollection()
+        public DefaultController()
         {
-            var returnList = new List<VectorDto>();
-            var count = 10000;
+            _engine = new DefaultEngine();
+        }
 
-            double vectorLength = rnd.Next(0, 10) / 10f;
+        /*
+         * limit: max number of vectors returned
+         * n1: NormalVector X
+         * n2: NormalVector Y
+         * n3: NormalVector Z
+         * x: X value of point on Plain
+         * y: Y value of point on Plain
+         * z: Z value of point on Plain
+         * maxDist = 0.5: maximal Distance of returned vector bases to plain
+         */
+        [HttpGet("data/v2")]
+        public ActionResult<List<VectorDto>> GetVectorCollectionV2(int limit = MAX_VECTOR, double? n1 = null, double? n2 = null, double? n3 = null, double? x = null, double? y = null, double? z = null, double maxDist = 0.5)
+        {
+            var vectors = _engine.GenerateVectors(MAX_VECTOR);
 
-            for(int i = 0; i < count; i++)
+            if(n1.HasValue || n2.HasValue || n3.HasValue || x.HasValue || y.HasValue || z.HasValue)
             {
-                var vector = new VectorDto()
+                //makes sure that all variables are set
+                if(!n1.HasValue || !n2.HasValue || !n3.HasValue || !x.HasValue || !y.HasValue || !z.HasValue)
                 {
-                    x = ((i % 10) / 10f - 0.5f),
-                    y = (Math.Floor(i / 100f) / 10f),
-                    z = ((Math.Floor(i / 10f) % 10) / 10f - 0.5f),
-                    xVec = vectorLength,
-                    yVec = vectorLength,
-                    zVec = vectorLength
-                };
+                    return BadRequest("Please specify n1, n2, n3, x, y and z");
+                }
 
-                returnList.Add(vector);
+                VectorDto plainVector = new VectorDto()
+                {
+                    x = x.Value,
+                    y = y.Value,
+                    z = z.Value,
+                    xVec = n1.Value,
+                    yVec = n2.Value,
+                    zVec = n3.Value
+                };
+                vectors = _engine.FilterVectors(vectors, plainVector, 0.5);
             }
 
-            Response.Headers.Add("YOLO", "You Only live once du kek");
+            if (vectors.Count > limit)
+            {
+                vectors.RemoveRange(limit, vectors.Count - limit);
+            }
+
+            return vectors;
+        }
+
+        [HttpGet("data")]
+        public ActionResult<List<VectorDto>> GetVectorCollection(int limit = MAX_VECTOR, int offset = 0, int? minY = null, int? maxY = null, int? minX = null, int? maxX = null)
+        {
+            var returnList = _engine.GenerateVectors(MAX_VECTOR);
+
+            //Filter Y axis
+            if(minY != null && maxY != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.y >= minY && vector.y <= maxY; }).ToList();
+            }
+            else if(minY != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.y >= minY; }).ToList();
+            }
+            else if(maxY != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.y <= maxY; }).ToList();
+            }
+
+            //Filter X axis
+            if (minX != null && maxX != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.x >= minX && vector.x <= maxX; }).ToList();
+            }
+            else if (minX != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.x >= minX; }).ToList();
+            }
+            else if (maxX != null)
+            {
+                returnList = returnList.Where((vector) => { return vector.x <= maxX; }).ToList();
+            }
+
+            //Convert output to fullfill offset & limit
+            if (offset != 0)
+            {
+                if(offset >= returnList.Count)
+                {
+                    returnList.Clear();
+                }
+                else
+                {
+                    returnList.RemoveRange(0, offset);
+                }
+            }
+            if(returnList.Count > limit)
+            {
+                returnList.RemoveRange(limit, returnList.Count - limit);
+            }
 
             return returnList;
         }

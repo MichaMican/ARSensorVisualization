@@ -1,59 +1,72 @@
-declare const THREE: any
-declare const THREEx: any
+import {
+	Camera,
+	Group,
+	Object3D,
+	Renderer
+} from 'three'
+import {
+    ArToolkitSource as ArSource,
+    ArToolkitContext as ArContext,
+    ArMarkerControls
+} from 'ar'
 
 export class ArWrapper {
-	renderer: any
-	arToolkitSource: any
-	arToolkitContext: any
+	readonly arSource: ArSource
+	readonly arContext: ArContext
 
-	constructor(renderer, camera, cameraParametersUrl) {
-		this.renderer = renderer
-
-		// Create ArToolkitSource
-		this.arToolkitSource = new THREEx.ArToolkitSource({
+	constructor(
+		readonly renderer: Renderer,
+		camera: Camera,
+		cameraParametersUrl: String
+	) {
+		// Create ArSource
+		this.arSource = new ArSource({
 			sourceType : 'webcam'
 		})
 
-		this.arToolkitSource.init(() => this.updateSize())
+		this.arSource.init(() => this.updateSize())
 
-
-		// Create ArToolkitContext
-		this.arToolkitContext = new THREEx.ArToolkitContext({
+		// Create ArContext
+		this.arContext = new ArContext({
 			cameraParametersUrl: cameraParametersUrl,
 			detectionMode: 'mono'
 		})
 		
 		// Copy projection matrix to camera when initialization complete
-		this.arToolkitContext.init(() => {
-			camera.projectionMatrix.copy(this.arToolkitContext.getProjectionMatrix())
+		this.arContext.init(() => {
+			camera.projectionMatrix.copy(this.arContext.getProjectionMatrix())
 		})
-
-		// Handle resize event
-		// window.addEventListener('resize', () => this.updateSize())
 	}
 
 	updateSize() {
-		this.arToolkitSource.onResizeElement()	
-		this.arToolkitSource.copyElementSizeTo(this.renderer.domElement)	
-		if (this.arToolkitContext.arController) {
-			this.arToolkitSource.copyElementSizeTo(this.arToolkitContext.arController.canvas)	
+		this.arSource.onResizeElement()	
+		this.arSource.copyElementSizeTo(this.renderer.domElement)	
+		if (this.arContext.arController) {
+			this.arSource.copyElementSizeTo(this.arContext.arController.canvas)	
 		}
 	}
 
 	update() {
-		if (this.arToolkitSource.ready) {
-			this.arToolkitContext.update(this.arToolkitSource.domElement);
+		if (this.arSource.ready && this.arSource.domElement) {
+			this.arContext.update(this.arSource.domElement)
 		}
 	}
-	
-	createMarkerRoot(parent, patternUrl) {
-		const markerRoot = new THREE.Group()
-		parent.add(markerRoot)
 
-		const markerControls = new THREEx.ArMarkerControls(this.arToolkitContext, markerRoot, {
+	attachMarkerControls(
+		markerRoot: Object3D,
+		patternUrl: String
+	): ArMarkerControls {
+		return new ArMarkerControls(this.arContext, markerRoot, {
 			type: 'pattern',
 			patternUrl: patternUrl
 		})
+	}
+	
+	createMarkerRoot(parent: Object3D, patternUrl: String): Group {
+		const markerRoot = new Group()
+		parent.add(markerRoot)
+
+		this.attachMarkerControls(markerRoot, patternUrl)
 	
 		return markerRoot
 	}
