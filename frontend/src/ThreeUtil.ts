@@ -28,7 +28,7 @@ export function createRenderer(parentElement: Node): Renderer {
 		alpha: true
 	})
 	
-	renderer.setClearColor(new Color('lightgrey'), 0)
+	renderer.setClearColor(0, 0)
 	renderer.setSize(640, 480)
 	
 	renderer.domElement.style.position = 'absolute'
