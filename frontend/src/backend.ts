@@ -1,4 +1,4 @@
-import { Line3 } from "./Line3"
+import { Line3 } from "./Data3D"
 
 const backendURL = 'https://ardatatest.azurewebsites.net'
 

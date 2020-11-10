@@ -21,7 +21,7 @@ import {
 } from './ThreeUtil'
 
 import { ArWrapper } from './ArWrapper'
-import { Line3 } from './Line3'
+import { Line3 } from './Data3D'
 
 
 function createArrowCloud(
@@ -60,7 +60,7 @@ function run(updateCallback: () => void) {
 }
 
 
-//initialise GUI watchers
+// Initialise GUI watchers
 const gui = new GUI()
 
 
@@ -83,7 +83,7 @@ const arrowCloud = createArrowCloud(root, 10000)
 
 updatePositioning(root, Backend.markerPositioning)
 
-loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', (kokille) => {
+loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', kokille => {
 	root.add(kokille)
 
 	updatePositioning(kokille, Backend.kokilleTransformation)
