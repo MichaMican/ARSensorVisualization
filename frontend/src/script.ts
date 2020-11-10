@@ -1,4 +1,4 @@
-import { initGui } from './gui'
+import GUI from './gui'
 
 import * as backend from './backend'
 
@@ -21,6 +21,7 @@ import {
 } from './ThreeUtil'
 
 import { ArWrapper } from './ArWrapper'
+import { Line3 } from './Line3'
 
 
 function createArrowCloud(
@@ -58,6 +59,11 @@ function run(updateCallback: () => void) {
 	animate()
 }
 
+
+//initialise GUI watchers
+const gui = new GUI()
+
+
 const scene = new Scene()
 
 const camera = new Camera()
@@ -66,7 +72,7 @@ scene.add(camera)
 const ambientLight = new AmbientLight(0xcccccc, 0.5)
 scene.add(ambientLight)
 
-const renderer = createRenderer(document.getElementById("canvas")!)
+const renderer = createRenderer(gui.canvas)
 
 const ar = new ArWrapper(renderer, camera, backend.cameraParameters)
 const markerRoot = ar.createMarkerRoot(scene, backend.markerPattern)
@@ -82,15 +88,6 @@ loadModel(backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', (kokille) => {
 
 	updatePositioning(kokille, backend.kokilleTransformation)
 })
-
-interface Line3 {
-	x?: Number,
-	y?: Number,
-	z?: Number,
-	xVec?: Number,
-	yVec?: Number,
-	zVec?: Number
-}
 
 let lines: Array<Line3> = []
 let lastLines: Array<Line3> = lines
@@ -129,18 +126,6 @@ function moveArrowToLine(arrow: Arrow, line: Line3) {
 }
 
 setInterval(async () => {
-	try {
-		const result = await fetch(backend.data)
-		const linesJSON = await result.json()
-
-		if (linesJSON instanceof Array) {
-			lines = linesJSON
-		}
-	} catch (e) {
-		lines = []
-
-		console.log(e)
-	}
+	const plain = gui.filterPlain;
+	lines = await backend.getVectorData(plain.x, plain.y, plain.z, plain.nVector.x, plain.nVector.y, plain.nVector.z);
 }, 500)
-
-initGui()

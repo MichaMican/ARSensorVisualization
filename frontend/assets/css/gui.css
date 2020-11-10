@@ -1,0 +1,41 @@
+.content {
+    position: relative;
+    z-index: 100;
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.slider {
+    height: 25px;
+    width: 100%;
+}
+
+div.controllerWrapper {
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+div.sliderWrapper {
+    max-width: 900px;
+    margin: auto;
+}
+div.inputWrapper {
+    margin: auto;
+}
+
+h2 {
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+
+div.inputWrapper > input{
+    text-align: center;
+}

@@ -4,75 +4,33 @@
 	<title>AR Sensor Visualisation</title>
 
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-</head>
 
-<style>
-	.content {
-		position: relative;
-		z-index: 100;
-	}
+	<link rel="stylesheet" href="./assets/css/gui.css">
 
-	.background {
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: -1;
-	}
-
-	.slider {
-		-webkit-appearance: none;
-		height: 25px;
-		width: 90vh;
-		background: #d3d3d3;
-		outline: none;
-		opacity: 0.7;
-		-webkit-transition: .2s;
-		transition: opacity .2s;
-		-webkit-transform: rotate(270deg);
-		-moz-transform: rotate(270deg);
-		-o-transform: rotate(270deg);
-		-ms-transform: rotate(270deg);
-		transform: rotate(270deg);
-		margin-top: 45vh;
-		margin-left: calc(100% - 47vh);
-	}
-
-	/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-	.slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		/* Override default look */
-		appearance: none;
-		width: 25px;
-		/* Set a specific slider handle width */
-		height: 25px;
-		/* Slider handle height */
-		background: #4CAF50;
-		/* Green background */
-		cursor: pointer;
-		/* Cursor on hover */
-	}
-
-	.slider::-moz-range-thumb {
-		width: 25px;
-		/* Set a specific slider handle width */
-		height: 25px;
-		/* Slider handle height */
-		background: #4CAF50;
-		/* Green background */
-		cursor: pointer;
-		/* Cursor on hover */
-	}
-
-	div.sliderWrapper {}
-</style>
 </head>
 
 <body style='margin: 0; overflow: hidden'>
 	<div class="content">
-		<div class="sliderWrapper">
-			<input id="slider" class="slider" type="range" min="1" max="100" value="50" orient="vertical">
-			<div id="display">50</div>
+		<div class="controllerWrapper">
+			<div class="sliderWrapper">
+				<h2>X</h2>
+				<input id="sliderX" class="slider" type="range" min="-100" max="100" value="0">
+				<div id="displayX">0</div>
+				<h2>Y</h2>
+				<input id="sliderY" class="slider" type="range" min="-100" max="100" value="0">
+				<div id="displayY">0</div>
+				<h2>Z</h2>
+				<input id="sliderZ" class="slider" type="range" min="-100" max="100" value="0">
+				<div id="displayZ">0</div>
+			</div>
+			<div class="inputWrapper">
+				<h2>rotX</h2>
+				<input id="inputRotX" value="0" type="number">
+				<h2>rotZ</h2>
+				<input id="inputRotZ" value="0" type="number">
+			</div>
 		</div>
+
 	</div>
 	<div class="background" id="canvas"></div>
 </body>
