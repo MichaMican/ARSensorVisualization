@@ -1,84 +1,78 @@
-import {Vector3} from "three"
+import { Vector3, MathUtils as ThreeMath } from "three"
 
-export function initGui(): void {
-    const sliderX = document.getElementById("sliderX") as HTMLInputElement
-    const sliderY = document.getElementById("sliderY") as HTMLInputElement
-    const sliderZ = document.getElementById("sliderZ") as HTMLInputElement
-    const inputRotX = document.getElementById("inputRotX") as HTMLInputElement
-    const inputRotZ = document.getElementById("inputRotZ") as HTMLInputElement
-    const displayX = document.getElementById("displayX") as HTMLDivElement
-    const displayY = document.getElementById("displayY") as HTMLDivElement
-    const displayZ = document.getElementById("displayZ") as HTMLDivElement
+export default class Gui {
 
-    //init display with default value
-    displayX.textContent = sliderX.value.toString()
-    displayY.textContent = sliderY.value.toString()
-    displayZ.textContent = sliderZ.value.toString()
+    public readonly canvas: HTMLDivElement = document.getElementById("canvas") as HTMLDivElement
 
-    //update display when slider changes
-    sliderX.oninput = () => {
-        displayX.textContent = sliderX.value.toString()
-        updateFilterPlain()
-    }
-    sliderY.oninput = () => {
-        displayY.textContent = sliderY.value.toString()
-        updateFilterPlain()
-    }
-    sliderZ.oninput = () => {
-        displayZ.textContent = sliderZ.value.toString()
-        updateFilterPlain()
+    private readonly sliderX: HTMLInputElement = document.getElementById("sliderX") as HTMLInputElement
+    private readonly sliderY: HTMLInputElement = document.getElementById("sliderY") as HTMLInputElement
+    private readonly sliderZ: HTMLInputElement = document.getElementById("sliderZ") as HTMLInputElement
+    private readonly inputRotX: HTMLInputElement = document.getElementById("inputRotX") as HTMLInputElement
+    private readonly inputRotZ: HTMLInputElement = document.getElementById("inputRotZ") as HTMLInputElement
+    private readonly displayX: HTMLDivElement = document.getElementById("displayX") as HTMLDivElement
+    private readonly displayY: HTMLDivElement = document.getElementById("displayY") as HTMLDivElement
+    private readonly displayZ: HTMLDivElement = document.getElementById("displayZ") as HTMLDivElement
+
+    get filterPlain(): Plain {
+        return new Plain(+this.sliderX.value, +this.sliderY.value, +this.sliderZ.value, +this.inputRotX.value, +this.inputRotZ.value)
     }
 
-    inputRotX.onchange = () => {
+    constructor() {
+        //init display with default value
+        this.displayX.textContent = this.sliderX.value.toString()
+        this.displayY.textContent = this.sliderY.value.toString()
+        this.displayZ.textContent = this.sliderZ.value.toString()
+
+        //update display when slider changes
+        this.sliderX.oninput = () => {
+            this.displayX.textContent = this.sliderX.value.toString()
+        }
+        this.sliderY.oninput = () => {
+            this.displayY.textContent = this.sliderY.value.toString()
+        }
+        this.sliderZ.oninput = () => {
+            this.displayZ.textContent = this.sliderZ.value.toString()
+        }
+
+        this.inputRotX.onchange = () => {
+            this.inputRotX.value = this.normaliseAngle(+this.inputRotX.value).toString()
+        }
+        this.inputRotZ.onchange = () => {
+            this.inputRotZ.value = this.normaliseAngle(+this.inputRotZ.value).toString()
+        }
+    }
+
+    private normaliseAngle(angle: number): number {
         //convert input to -180° - 180° range
-        let xAngle: number = (+inputRotX.value % 360 + 360) % 360;
-        if(xAngle > 180){
-            xAngle -= 360
+        let normalisedAngle: number = (angle % 360 + 360) % 360;
+        if (normalisedAngle > 180) {
+            normalisedAngle -= 360
         }
 
-        if(xAngle != +inputRotX.value){
-            inputRotX.value = xAngle.toString()
-        }
-        updateFilterPlain()
+        return normalisedAngle
     }
-    inputRotZ.onchange = () => {
-        //convert input to -180° - 180° range
-        let zAngle: number = (+inputRotZ.value % 360 + 360) % 360;
-        if(zAngle > 180){
-            zAngle -= 360
-        }
-
-        if(zAngle != +inputRotZ.value){
-            inputRotZ.value = zAngle.toString()
-        }
-
-        updateFilterPlain()
-    }
-
-    function updateFilterPlain(): void {
-        const plain = new Plain(+sliderX.value, +sliderY.value, +sliderZ.value, +inputRotX.value, +inputRotZ.value)
-    }
-
 }
 
-class Plain{
+
+
+export class Plain {
     x: number
     y: number
     z: number
     nVector: Vector3
 
-    constructor(x:number, y:number, z:number, xRot: number, zRot: number){
+    constructor(x: number, y: number, z: number, xRot: number, zRot: number) {
         this.x = x
         this.y = y
         this.z = z
 
         //Vector that points up
-        this.nVector = new Vector3(0,1,0)
-        const xAxis = new Vector3(1,0,0)
-        const zAxis = new Vector3(0,0,1)
+        this.nVector = new Vector3(0, 1, 0)
+        const xAxis = new Vector3(1, 0, 0)
+        const zAxis = new Vector3(0, 0, 1)
 
-        this.nVector.applyAxisAngle(xAxis, xRot)
-        this.nVector.applyAxisAngle(zAxis, zRot)
+        this.nVector.applyAxisAngle(xAxis, ThreeMath.degToRad(xRot))
+        this.nVector.applyAxisAngle(zAxis, ThreeMath.degToRad(zRot))
     }
 }
 
