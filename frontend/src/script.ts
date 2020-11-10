@@ -1,6 +1,6 @@
 import GUI from './gui'
 
-import * as backend from './backend'
+import Backend from './backend'
 
 import {
 	AmbientLight,
@@ -74,19 +74,19 @@ scene.add(ambientLight)
 
 const renderer = createRenderer(gui.canvas)
 
-const ar = new ArWrapper(renderer, camera, backend.cameraParameters)
-const markerRoot = ar.createMarkerRoot(scene, backend.markerPattern)
+const ar = new ArWrapper(renderer, camera, Backend.cameraParameters)
+const markerRoot = ar.createMarkerRoot(scene, Backend.markerPattern)
 
 const root = createGroup(markerRoot)
 
 const arrowCloud = createArrowCloud(root, 10000)
 
-updatePositioning(root, backend.markerPositioning)
+updatePositioning(root, Backend.markerPositioning)
 
-loadModel(backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', (kokille) => {
+loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', (kokille) => {
 	root.add(kokille)
 
-	updatePositioning(kokille, backend.kokilleTransformation)
+	updatePositioning(kokille, Backend.kokilleTransformation)
 })
 
 let lines: Array<Line3> = []
@@ -126,6 +126,14 @@ function moveArrowToLine(arrow: Arrow, line: Line3) {
 }
 
 setInterval(async () => {
-	const plain = gui.filterPlain;
-	lines = await backend.getVectorData(plain.x, plain.y, plain.z, plain.nVector.x, plain.nVector.y, plain.nVector.z);
+	const plain = gui.filterPlain
+
+	lines = await Backend.getVectorData(
+		plain.x,
+		plain.y,
+		plain.z,
+		plain.nVector.x,
+		plain.nVector.y,
+		plain.nVector.z
+	)
 }, 500)
