@@ -11,8 +11,8 @@ import {
 } from 'ar'
 
 export class ArWrapper {
-	readonly arSource: ArSource
-	readonly arContext: ArContext
+	private readonly arSource: ArSource
+	private readonly arContext: ArContext
 
 	constructor(
 		readonly renderer: Renderer,
@@ -24,8 +24,6 @@ export class ArWrapper {
 			sourceType : 'webcam'
 		})
 
-		this.arSource.init(() => this.updateSize())
-
 		// Create ArContext
 		this.arContext = new ArContext({
 			cameraParametersUrl: cameraParametersUrl,
@@ -36,13 +34,22 @@ export class ArWrapper {
 		this.arContext.init(() => {
 			camera.projectionMatrix.copy(this.arContext.getProjectionMatrix())
 		})
+		
+		// Init ArSource and update DOM element sizes
+		this.arSource.init(() => {
+			// Give elements time to initialize
+			setTimeout(() => this.updateSize(), 2000)
+		})
+
+		// Handle window resize
+		window.addEventListener('resize', () => this.updateSize())
 	}
 
 	updateSize() {
-		this.arSource.onResizeElement()	
-		this.arSource.copyElementSizeTo(this.renderer.domElement)	
+		this.arSource.onResizeElement()
+		this.arSource.copyElementSizeTo(this.renderer.domElement)
 		if (this.arContext.arController) {
-			this.arSource.copyElementSizeTo(this.arContext.arController.canvas)	
+			this.arSource.copyElementSizeTo(this.arContext.arController.canvas)
 		}
 	}
 
@@ -52,7 +59,7 @@ export class ArWrapper {
 		}
 	}
 
-	attachMarkerControls(
+	private attachMarkerControls(
 		markerRoot: Object3D,
 		patternUrl: String
 	): ArMarkerControls {

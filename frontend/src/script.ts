@@ -1,3 +1,4 @@
+import { initGui } from './gui'
 import {
 	AmbientLight,
 	ArrowHelper as Arrow,
@@ -62,7 +63,7 @@ scene.add(camera)
 const ambientLight = new AmbientLight(0xcccccc, 0.5)
 scene.add(ambientLight)
 
-const renderer = createRenderer(document.body)
+const renderer = createRenderer(document.getElementById("canvas")!)
 
 const ar = new ArWrapper(renderer, camera, '../data/camera_para.dat')
 const markerRoot = ar.createMarkerRoot(scene, '../data/hiro.patt')
@@ -138,3 +139,5 @@ setInterval(async () => {
 		console.log(e)
 	}
 }, 500)
+
+initGui()
