@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -30,6 +33,7 @@ namespace backend
             }));
 
             services.AddControllers();
+            services.AddDirectoryBrowser();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,8 +51,22 @@ namespace backend
             app.UseHttpsRedirection();
 #endif
 
+            var provider = new FileExtensionContentTypeProvider();
 
-            app.UseStaticFiles();
+            provider.Mappings[".dat"] = "application/octet-stream";
+            provider.Mappings[".patt"] = "text/html";
+            provider.Mappings[".mtl"] = "text/html";
+            provider.Mappings[".obj"] = "text/html";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(env.WebRootPath, "data")),
+                RequestPath = "/data",
+                ContentTypeProvider = provider
+            });
+
+            app.UseDirectoryBrowser();
 
             app.UseRouting();
 
