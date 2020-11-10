@@ -1,4 +1,7 @@
 import { initGui } from './gui'
+
+import * as backend from './backend'
+
 import {
 	AmbientLight,
 	ArrowHelper as Arrow,
@@ -65,19 +68,19 @@ scene.add(ambientLight)
 
 const renderer = createRenderer(document.getElementById("canvas")!)
 
-const ar = new ArWrapper(renderer, camera, '../data/camera_para.dat')
-const markerRoot = ar.createMarkerRoot(scene, '../data/hiro.patt')
+const ar = new ArWrapper(renderer, camera, backend.cameraParameters)
+const markerRoot = ar.createMarkerRoot(scene, backend.markerPattern)
 
 const root = createGroup(markerRoot)
 
 const arrowCloud = createArrowCloud(root, 10000)
 
-updatePositioning(root, '../data/positioning.json')
+updatePositioning(root, backend.markerPositioning)
 
-loadModel('../data/model/', 'kokille.obj', 'kokille.mtl', (kokille) => {
+loadModel(backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', (kokille) => {
 	root.add(kokille)
 
-	updatePositioning(kokille, '../data/kokilleTransformation.json')
+	updatePositioning(kokille, backend.kokilleTransformation)
 })
 
 interface Line3 {
@@ -127,7 +130,7 @@ function moveArrowToLine(arrow: Arrow, line: Line3) {
 
 setInterval(async () => {
 	try {
-		const result = await fetch('https://ardatatest.azurewebsites.net/api/data')
+		const result = await fetch(backend.data)
 		const linesJSON = await result.json()
 
 		if (linesJSON instanceof Array) {

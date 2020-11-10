@@ -3,8 +3,7 @@ declare module 'ar' {
 		Camera,
 		EventDispatcher,
 		Matrix4,
-		Object3D,
-		Renderer
+		Object3D
 	} from 'three'
 
 	class ArToolkitSource {
@@ -39,6 +38,12 @@ declare module 'ar' {
 
 		copyElementSizeTo(otherElement: HTMLElement): void
 	}
+
+	interface ARController {
+		// TODO: add other members of ARController
+		readonly canvas: HTMLCanvasElement
+		readonly ctx: CanvasRenderingContext2D | null
+	}
 	
 	class ArToolkitContext extends EventDispatcher {
 		static readonly REVISION: String
@@ -49,8 +54,7 @@ declare module 'ar' {
 
 		initialized: boolean
 
-		arController?: any
-		arucoContext?: any
+		arController?: ARController
 
 		constructor(
 			parameters: ArContextParameters
