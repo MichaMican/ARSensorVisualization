@@ -50,6 +50,7 @@ namespace backend
             //Add Https Redirection only in release build
             app.UseHttpsRedirection();
 #endif
+            app.UseCors("AllowAnyOrigin");
 
             var provider = new FileExtensionContentTypeProvider();
 
@@ -60,6 +61,7 @@ namespace backend
 
             app.UseStaticFiles(new StaticFileOptions
             {
+                ServeUnknownFileTypes=true,
                 FileProvider = new PhysicalFileProvider(
                     Path.Combine(env.WebRootPath, "data")),
                 RequestPath = "/data",
@@ -70,7 +72,6 @@ namespace backend
 
             app.UseRouting();
 
-            app.UseCors("AllowAnyOrigin");
 
             app.UseAuthorization();
 
