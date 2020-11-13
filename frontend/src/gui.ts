@@ -1,6 +1,5 @@
-import { Vector3, MathUtils as ThreeMath } from "three"
-import * as backend from './backend'
-
+import Backend from './backend'
+import { Plain3 } from './Data3D'
 
 export default class Gui {
 
@@ -20,8 +19,14 @@ export default class Gui {
     private readonly filterCbx: HTMLInputElement = document.getElementById("toggleFilter") as HTMLInputElement
 
 
-    get filterPlain(): Plain {
-        return new Plain(+this.sliderX.value, +this.sliderY.value, +this.sliderZ.value, +this.inputRotX.value, +this.inputRotZ.value)
+    get filterPlain(): Plain3 {
+        return new Plain3(
+			+this.sliderX.value,
+			+this.sliderY.value,
+			+this.sliderZ.value,
+			+this.inputRotX.value,
+			+this.inputRotZ.value
+		)
     }
 
     get filterEnabled(): boolean {
@@ -30,7 +35,7 @@ export default class Gui {
 
     constructor() {
 
-        backend.getMetaData().then(metaData => {
+        Backend.getMetaData().then(metaData => {
             this.sliderX.min = Math.floor(metaData.xMin - 0.05 * (Math.abs(metaData.xMin) + Math.abs(metaData.xMax))).toString()
             this.sliderY.min = Math.floor(metaData.yMin - 0.05 * (Math.abs(metaData.yMin) + Math.abs(metaData.yMax))).toString()
             this.sliderZ.min = Math.floor(metaData.zMin - 0.05 * (Math.abs(metaData.zMin) + Math.abs(metaData.zMax))).toString()
@@ -52,7 +57,7 @@ export default class Gui {
         this.displayY.textContent = this.sliderY.value.toString()
         this.displayZ.textContent = this.sliderZ.value.toString()
 
-        //update display when slider changes
+        // Update display when slider changes
         this.sliderX.oninput = () => {
             this.displayX.textContent = this.sliderX.value.toString()
         }
@@ -72,7 +77,7 @@ export default class Gui {
     }
 
     private normaliseAngle(angle: number): number {
-        //convert input to -180° - 180° range
+        // Convert input to -180° - 180° range
         let normalisedAngle: number = (angle % 360 + 360) % 360;
         if (normalisedAngle > 180) {
             normalisedAngle -= 360
@@ -81,27 +86,3 @@ export default class Gui {
         return normalisedAngle
     }
 }
-
-
-
-export class Plain {
-    x: number
-    y: number
-    z: number
-    nVector: Vector3
-
-    constructor(x: number, y: number, z: number, xRot: number, zRot: number) {
-        this.x = x
-        this.y = y
-        this.z = z
-
-        //Vector that points up
-        this.nVector = new Vector3(0, 1, 0)
-        const xAxis = new Vector3(1, 0, 0)
-        const zAxis = new Vector3(0, 0, 1)
-
-        this.nVector.applyAxisAngle(xAxis, ThreeMath.degToRad(xRot))
-        this.nVector.applyAxisAngle(zAxis, ThreeMath.degToRad(zRot))
-    }
-}
-

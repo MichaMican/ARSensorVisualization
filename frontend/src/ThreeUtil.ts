@@ -2,25 +2,13 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import {
 	ArrowHelper as Arrow,
-	Color,
 	Group,
 	Object3D,
 	Renderer,
 	Vector3,
 	WebGLRenderer
 } from 'three'
-
-export interface LoosePoint3 {
-	x?: Number | null,
-	y?: Number | null,
-	z?: Number | null
-}
-
-export interface Point3 {
-	x: number,
-	y: number,
-	z: number
-}
+import { LoosePoint3, Point3 } from './Data3D'
 
 export function createRenderer(parentElement: Node): Renderer {
 	const renderer = new WebGLRenderer({
@@ -122,7 +110,7 @@ export function loadModel(
 ) {
 	const mtlLoader = new MTLLoader()
 	mtlLoader.setPath(basePath)
-	mtlLoader.load(texturePath, (materials) => {
+	mtlLoader.load(texturePath, materials => {
 		materials.preload()
 
 		const objLoader = new OBJLoader()
