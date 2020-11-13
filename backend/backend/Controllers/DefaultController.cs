@@ -20,6 +20,30 @@ namespace backend.Controllers
             _engine = new DefaultEngine();
         }
 
+        [HttpGet("data/meta")]
+        public ActionResult<VectorDataMetaData> GetVectorMetaData()
+        {
+            var vectors = _engine.GenerateVectors(MAX_VECTOR);
+            var xMin = vectors.Min((v) => v.x);
+            var yMin = vectors.Min((v) => v.y);
+            var zMin = vectors.Min((v) => v.z);
+            var xMax = vectors.Max((v) => v.x);
+            var yMax = vectors.Max((v) => v.y);
+            var zMax = vectors.Max((v) => v.z);
+            var totalVectors = vectors.Count;
+
+            return new VectorDataMetaData()
+            {
+                totalVecotrs = totalVectors,
+                xMin = xMin,
+                yMin = yMin,
+                zMin = zMin,
+                xMax = xMax,
+                yMax = yMax,
+                zMax = zMax
+            };
+        }
+
         /*
          * limit: max number of vectors returned
          * n1: NormalVector X
