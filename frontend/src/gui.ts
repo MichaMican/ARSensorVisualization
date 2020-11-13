@@ -42,6 +42,16 @@ export default class Gui {
             this.sliderX.max = Math.ceil(metaData.xMax + 0.05 * (Math.abs(metaData.xMax) + Math.abs(metaData.xMin))).toString()
             this.sliderY.max = Math.ceil(metaData.yMax + 0.05 * (Math.abs(metaData.yMax) + Math.abs(metaData.yMin))).toString()
             this.sliderZ.max = Math.ceil(metaData.zMax + 0.05 * (Math.abs(metaData.zMax) + Math.abs(metaData.zMin))).toString()
+
+            //set default value of sliders in the middle of its range
+            this.sliderX.value = ((+this.sliderX.max - +this.sliderX.min) / 2 + +this.sliderX.min).toFixed(2)
+            this.sliderY.value = ((+this.sliderY.max - +this.sliderY.min) / 2 + +this.sliderY.min).toFixed(2)
+            this.sliderZ.value = ((+this.sliderZ.max - +this.sliderZ.min) / 2 + +this.sliderZ.min).toFixed(2)
+
+            //update value displays
+            this.sliderX.oninput!(new Event(""))
+            this.sliderY.oninput!(new Event(""))
+            this.sliderZ.oninput!(new Event(""))
         })
 
         this.openFilterMenu.onclick = () => {
