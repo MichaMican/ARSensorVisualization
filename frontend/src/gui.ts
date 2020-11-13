@@ -1,4 +1,6 @@
 import { Vector3, MathUtils as ThreeMath } from "three"
+import * as backend from './backend'
+
 
 export default class Gui {
 
@@ -18,6 +20,16 @@ export default class Gui {
     }
 
     constructor() {
+
+        backend.getMetaData().then(metaData => {
+            this.sliderX.min = Math.round(metaData.xMin - 0.05 * (Math.abs(metaData.xMin) + Math.abs(metaData.xMax))).toString()
+            this.sliderY.min = Math.round(metaData.yMin - 0.05 * (Math.abs(metaData.yMin) + Math.abs(metaData.yMax))).toString()
+            this.sliderZ.min = Math.round(metaData.zMin - 0.05 * (Math.abs(metaData.zMin) + Math.abs(metaData.zMax))).toString()
+            this.sliderX.max = Math.round(metaData.xMax + 0.05 * (Math.abs(metaData.xMax) + Math.abs(metaData.xMin))).toString()
+            this.sliderY.max = Math.round(metaData.yMax + 0.05 * (Math.abs(metaData.yMax) + Math.abs(metaData.yMin))).toString()
+            this.sliderZ.max = Math.round(metaData.zMax + 0.05 * (Math.abs(metaData.zMax) + Math.abs(metaData.zMin))).toString()
+        })
+
         //init display with default value
         this.displayX.textContent = this.sliderX.value.toString()
         this.displayY.textContent = this.sliderY.value.toString()

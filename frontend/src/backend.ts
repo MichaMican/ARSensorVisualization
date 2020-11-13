@@ -1,3 +1,4 @@
+import { DataMetaDat } from "./DataMetaDat"
 import { Line3 } from "./Line3"
 
 const backendURL = 'https://ardatatest.azurewebsites.net'
@@ -9,6 +10,7 @@ export const markerPositioning = `${backendURL}/data/positioning.json`
 export const kokilleModelPath = `${backendURL}/data/model/`
 
 export const data = `${backendURL}/api/data/v2`
+export const metaData = `${backendURL}/api/data/meta`
 
 /**
  * 
@@ -41,4 +43,10 @@ export async function getVectorData(x: number, y: number, z:number, n1: number, 
     }
     
     return []
+}
+
+export async function getMetaData(): Promise<DataMetaDat> {
+    const result = await fetch(metaData)
+    const metaJSON = await result.json()
+    return metaJSON
 }
