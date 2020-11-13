@@ -1,4 +1,5 @@
-import { Vector3, MathUtils as ThreeMath } from "three"
+import Backend from './backend'
+import { Plain3 } from './Data3D'
 
 export default class Gui {
 
@@ -12,18 +13,61 @@ export default class Gui {
     private readonly displayX: HTMLDivElement = document.getElementById("displayX") as HTMLDivElement
     private readonly displayY: HTMLDivElement = document.getElementById("displayY") as HTMLDivElement
     private readonly displayZ: HTMLDivElement = document.getElementById("displayZ") as HTMLDivElement
+    private readonly openFilterMenu: HTMLButtonElement = document.getElementById("openFilterMenu") as HTMLButtonElement
+    private readonly closeFilterMenu: HTMLButtonElement = document.getElementById("closeFilterMenu") as HTMLButtonElement
+    private readonly controllerWrapper: HTMLDivElement = document.getElementById("filterControlDisplay") as HTMLDivElement
+    private readonly filterCbx: HTMLInputElement = document.getElementById("toggleFilter") as HTMLInputElement
 
-    get filterPlain(): Plain {
-        return new Plain(+this.sliderX.value, +this.sliderY.value, +this.sliderZ.value, +this.inputRotX.value, +this.inputRotZ.value)
+
+    get filterPlain(): Plain3 {
+        return new Plain3(
+			+this.sliderX.value,
+			+this.sliderY.value,
+			+this.sliderZ.value,
+			+this.inputRotX.value,
+			+this.inputRotZ.value
+		)
+    }
+
+    get filterEnabled(): boolean {
+        return this.filterCbx.checked
     }
 
     constructor() {
+
+        Backend.getMetaData().then(metaData => {
+            this.sliderX.min = Math.floor(metaData.xMin - 0.05 * (Math.abs(metaData.xMin) + Math.abs(metaData.xMax))).toString()
+            this.sliderY.min = Math.floor(metaData.yMin - 0.05 * (Math.abs(metaData.yMin) + Math.abs(metaData.yMax))).toString()
+            this.sliderZ.min = Math.floor(metaData.zMin - 0.05 * (Math.abs(metaData.zMin) + Math.abs(metaData.zMax))).toString()
+            this.sliderX.max = Math.ceil(metaData.xMax + 0.05 * (Math.abs(metaData.xMax) + Math.abs(metaData.xMin))).toString()
+            this.sliderY.max = Math.ceil(metaData.yMax + 0.05 * (Math.abs(metaData.yMax) + Math.abs(metaData.yMin))).toString()
+            this.sliderZ.max = Math.ceil(metaData.zMax + 0.05 * (Math.abs(metaData.zMax) + Math.abs(metaData.zMin))).toString()
+
+            //set default value of sliders in the middle of its range
+            this.sliderX.value = ((+this.sliderX.max - +this.sliderX.min) / 2 + +this.sliderX.min).toFixed(2)
+            this.sliderY.value = ((+this.sliderY.max - +this.sliderY.min) / 2 + +this.sliderY.min).toFixed(2)
+            this.sliderZ.value = ((+this.sliderZ.max - +this.sliderZ.min) / 2 + +this.sliderZ.min).toFixed(2)
+
+            //update value displays
+            this.sliderX.oninput!(new Event(""))
+            this.sliderY.oninput!(new Event(""))
+            this.sliderZ.oninput!(new Event(""))
+        })
+
+        this.openFilterMenu.onclick = () => {
+            this.controllerWrapper.style.visibility = ""
+        }
+
+        this.closeFilterMenu.onclick = () => {
+            this.controllerWrapper.style.visibility = "hidden"
+        }
+
         //init display with default value
         this.displayX.textContent = this.sliderX.value.toString()
         this.displayY.textContent = this.sliderY.value.toString()
         this.displayZ.textContent = this.sliderZ.value.toString()
 
-        //update display when slider changes
+        // Update display when slider changes
         this.sliderX.oninput = () => {
             this.displayX.textContent = this.sliderX.value.toString()
         }
@@ -43,7 +87,7 @@ export default class Gui {
     }
 
     private normaliseAngle(angle: number): number {
-        //convert input to -180° - 180° range
+        // Convert input to -180° - 180° range
         let normalisedAngle: number = (angle % 360 + 360) % 360;
         if (normalisedAngle > 180) {
             normalisedAngle -= 360
@@ -52,27 +96,3 @@ export default class Gui {
         return normalisedAngle
     }
 }
-
-
-
-export class Plain {
-    x: number
-    y: number
-    z: number
-    nVector: Vector3
-
-    constructor(x: number, y: number, z: number, xRot: number, zRot: number) {
-        this.x = x
-        this.y = y
-        this.z = z
-
-        //Vector that points up
-        this.nVector = new Vector3(0, 1, 0)
-        const xAxis = new Vector3(1, 0, 0)
-        const zAxis = new Vector3(0, 0, 1)
-
-        this.nVector.applyAxisAngle(xAxis, ThreeMath.degToRad(xRot))
-        this.nVector.applyAxisAngle(zAxis, ThreeMath.degToRad(zRot))
-    }
-}
-

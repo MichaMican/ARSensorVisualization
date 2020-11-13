@@ -1,6 +1,6 @@
 import GUI from './gui'
 
-import * as backend from './backend'
+import Backend from './backend'
 
 import {
 	AmbientLight,
@@ -21,7 +21,7 @@ import {
 } from './ThreeUtil'
 
 import { ArWrapper } from './ArWrapper'
-import { Line3 } from './Line3'
+import { Line3 } from './Data3D'
 
 
 function createArrowCloud(
@@ -48,7 +48,7 @@ function createArrowCloud(
 function run(updateCallback: () => void) {
 	function animate() {
 		requestAnimationFrame(animate)
-		
+
 		updateCallback()
 
 		ar.update()
@@ -60,7 +60,7 @@ function run(updateCallback: () => void) {
 }
 
 
-//initialise GUI watchers
+// Initialise GUI watchers
 const gui = new GUI()
 
 
@@ -74,19 +74,19 @@ scene.add(ambientLight)
 
 const renderer = createRenderer(gui.canvas)
 
-const ar = new ArWrapper(renderer, camera, backend.cameraParameters)
-const markerRoot = ar.createMarkerRoot(scene, backend.markerPattern)
+const ar = new ArWrapper(renderer, camera, Backend.cameraParameters)
+const markerRoot = ar.createMarkerRoot(scene, Backend.markerPattern)
 
 const root = createGroup(markerRoot)
 
 const arrowCloud = createArrowCloud(root, 10000)
 
-updatePositioning(root, backend.markerPositioning)
+updatePositioning(root, Backend.markerPositioning)
 
-loadModel(backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', (kokille) => {
+loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', kokille => {
 	root.add(kokille)
 
-	updatePositioning(kokille, backend.kokilleTransformation)
+	updatePositioning(kokille, Backend.kokilleTransformation)
 })
 
 let lines: Array<Line3> = []
@@ -98,11 +98,11 @@ run(() => {
 
 		const currentLines = lines
 		const arrowCount = arrowCloud.length
-	
+
 		for (let i = 0; i < arrowCount; i++) {
 			const arrow = arrowCloud[i]
 			const line = currentLines[i]
-	
+
 			if (line) {
 				arrow.visible = true
 				moveArrowToLine(arrow, line)
@@ -126,6 +126,21 @@ function moveArrowToLine(arrow: Arrow, line: Line3) {
 }
 
 setInterval(async () => {
-	const plain = gui.filterPlain;
-	lines = await backend.getVectorData(plain.x, plain.y, plain.z, plain.nVector.x, plain.nVector.y, plain.nVector.z);
+
+	if (gui.filterEnabled) {
+		const plain = gui.filterPlain
+
+		lines = await Backend.getVectorData(
+			plain.x,
+			plain.y,
+			plain.z,
+			plain.nVector.x,
+			plain.nVector.y,
+			plain.nVector.z
+		)
+	} else {
+		lines = await Backend.getAllVectorData();
+	}
+
+
 }, 500)

@@ -11,16 +11,19 @@
 
 <body style='margin: 0; overflow: hidden'>
 	<div class="content">
-		<div class="controllerWrapper">
+		<button id="openFilterMenu">Filter</button>
+		<div id="filterControlDisplay" class="controllerWrapper" style="visibility: hidden;">
+			<h3>Enable filter</h3>
+			<input id="toggleFilter" type="checkbox">
 			<div class="sliderWrapper">
 				<h2>X</h2>
-				<input id="sliderX" class="slider" type="range" min="-100" max="100" value="0">
+				<input id="sliderX" class="slider" type="range" min="-100" max="100" value="0" step="0.01">
 				<div id="displayX">0</div>
 				<h2>Y</h2>
-				<input id="sliderY" class="slider" type="range" min="-100" max="100" value="0">
+				<input id="sliderY" class="slider" type="range" min="-100" max="100" value="0" step="0.01">
 				<div id="displayY">0</div>
 				<h2>Z</h2>
-				<input id="sliderZ" class="slider" type="range" min="-100" max="100" value="0">
+				<input id="sliderZ" class="slider" type="range" min="-100" max="100" value="0" step="0.01">
 				<div id="displayZ">0</div>
 			</div>
 			<div class="inputWrapper">
@@ -29,6 +32,7 @@
 				<h2>rotZ</h2>
 				<input id="inputRotZ" value="0" type="number">
 			</div>
+			<button id="closeFilterMenu">Close</button>
 		</div>
 
 	</div>
