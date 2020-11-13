@@ -14,6 +14,9 @@ export default class Gui {
     private readonly displayX: HTMLDivElement = document.getElementById("displayX") as HTMLDivElement
     private readonly displayY: HTMLDivElement = document.getElementById("displayY") as HTMLDivElement
     private readonly displayZ: HTMLDivElement = document.getElementById("displayZ") as HTMLDivElement
+    private readonly openFilterMenu: HTMLButtonElement = document.getElementById("openFilterMenu") as HTMLButtonElement
+    private readonly closeFilterMenu: HTMLButtonElement = document.getElementById("closeFilterMenu") as HTMLButtonElement
+    private readonly controllerWrapper: HTMLDivElement = document.getElementById("filterControlDisplay") as HTMLDivElement
 
     get filterPlain(): Plain {
         return new Plain(+this.sliderX.value, +this.sliderY.value, +this.sliderZ.value, +this.inputRotX.value, +this.inputRotZ.value)
@@ -29,6 +32,14 @@ export default class Gui {
             this.sliderY.max = Math.ceil(metaData.yMax + 0.05 * (Math.abs(metaData.yMax) + Math.abs(metaData.yMin))).toString()
             this.sliderZ.max = Math.ceil(metaData.zMax + 0.05 * (Math.abs(metaData.zMax) + Math.abs(metaData.zMin))).toString()
         })
+
+        this.openFilterMenu.onclick = () => {
+            this.controllerWrapper.style.visibility = ""
+        }
+
+        this.closeFilterMenu.onclick = () => {
+            this.controllerWrapper.style.visibility = "hidden"
+        }
 
         //init display with default value
         this.displayX.textContent = this.sliderX.value.toString()
