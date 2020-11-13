@@ -17,9 +17,15 @@ export default class Gui {
     private readonly openFilterMenu: HTMLButtonElement = document.getElementById("openFilterMenu") as HTMLButtonElement
     private readonly closeFilterMenu: HTMLButtonElement = document.getElementById("closeFilterMenu") as HTMLButtonElement
     private readonly controllerWrapper: HTMLDivElement = document.getElementById("filterControlDisplay") as HTMLDivElement
+    private readonly filterCbx: HTMLInputElement = document.getElementById("toggleFilter") as HTMLInputElement
+
 
     get filterPlain(): Plain {
         return new Plain(+this.sliderX.value, +this.sliderY.value, +this.sliderZ.value, +this.inputRotX.value, +this.inputRotZ.value)
+    }
+
+    get filterEnabled(): boolean {
+        return this.filterCbx.checked
     }
 
     constructor() {

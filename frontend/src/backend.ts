@@ -21,7 +21,23 @@ export const metaData = `${backendURL}/api/data/meta`
  * @param n2 y value of normal vector of plain
  * @param n3 z value of normal vector of plain
  */
-export async function getVectorData(x: number, y: number, z:number, n1: number, n2: number, n3: number): Promise<Array<Line3>> {
+
+export async function getVectorData(): Promise<Array<Line3>>{
+    try {
+    const result = await fetch(data)
+		const linesJSON = await result.json()
+
+		if (linesJSON instanceof Array) {
+			return linesJSON
+		}
+	} catch (e) {
+		console.log(e)
+    }
+    
+    return []
+};
+
+export async function getVectorDataWithFilter(x: number, y: number, z:number, n1: number, n2: number, n3: number): Promise<Array<Line3>> {
     try {
 
         const url = new URL(data)

@@ -126,6 +126,12 @@ function moveArrowToLine(arrow: Arrow, line: Line3) {
 }
 
 setInterval(async () => {
-	const plain = gui.filterPlain;
-	lines = await backend.getVectorData(plain.x, plain.y, plain.z, plain.nVector.x, plain.nVector.y, plain.nVector.z);
+	
+	if(gui.filterEnabled){
+		const plain = gui.filterPlain;
+		lines = await backend.getVectorDataWithFilter(plain.x, plain.y, plain.z, plain.nVector.x, plain.nVector.y, plain.nVector.z);
+	} else {
+		lines = await backend.getVectorData();
+	}
+
 }, 500)
