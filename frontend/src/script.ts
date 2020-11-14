@@ -1,4 +1,4 @@
-import GUI from './gui'
+import GUI from './Gui'
 
 import Backend from './backend'
 
@@ -87,6 +87,10 @@ loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', kokille => {
 	root.add(kokille)
 
 	updatePositioning(kokille, Backend.kokilleTransformation)
+})
+
+gui.addEventListener('filterboxtoggle', (e) => {
+	console.log("Filter box enabled:", e.filterBoxEnabled)
 })
 
 let lines: Array<Line3> = []

@@ -1,5 +1,6 @@
 import Backend from './backend'
 import { Plain3 } from './Data3D'
+import { FilterBoxToggleEvent, FilterToggleEvent, GuiEventMap } from './GuiEvents'
 
 export default class Gui {
 
@@ -18,6 +19,7 @@ export default class Gui {
     private readonly controllerWrapper: HTMLDivElement = document.getElementById("filterControlDisplay") as HTMLDivElement
     private readonly filterCbx: HTMLInputElement = document.getElementById("toggleFilter") as HTMLInputElement
 
+    private readonly eventTargetDeligate: EventTarget = new EventTarget()
 
     get filterPlain(): Plain3 {
         return new Plain3(
@@ -33,8 +35,11 @@ export default class Gui {
         return this.filterCbx.checked
     }
 
-    constructor() {
+    get filterBoxEnabled(): boolean {
+        return this.filterEnabled
+    }
 
+    constructor() {
         Backend.getMetaData().then(metaData => {
             this.sliderX.min = Math.floor(metaData.xMin - 0.05 * (Math.abs(metaData.xMin) + Math.abs(metaData.xMax))).toString()
             this.sliderY.min = Math.floor(metaData.yMin - 0.05 * (Math.abs(metaData.yMin) + Math.abs(metaData.yMax))).toString()
@@ -43,47 +48,59 @@ export default class Gui {
             this.sliderY.max = Math.ceil(metaData.yMax + 0.05 * (Math.abs(metaData.yMax) + Math.abs(metaData.yMin))).toString()
             this.sliderZ.max = Math.ceil(metaData.zMax + 0.05 * (Math.abs(metaData.zMax) + Math.abs(metaData.zMin))).toString()
 
-            //set default value of sliders in the middle of its range
+            // Set default value of sliders in the middle of its range
             this.sliderX.value = ((+this.sliderX.max - +this.sliderX.min) / 2 + +this.sliderX.min).toFixed(2)
             this.sliderY.value = ((+this.sliderY.max - +this.sliderY.min) / 2 + +this.sliderY.min).toFixed(2)
             this.sliderZ.value = ((+this.sliderZ.max - +this.sliderZ.min) / 2 + +this.sliderZ.min).toFixed(2)
 
-            //update value displays
-            this.sliderX.oninput!(new Event(""))
-            this.sliderY.oninput!(new Event(""))
-            this.sliderZ.oninput!(new Event(""))
+            // Update value displays
+            this.sliderX.dispatchEvent(new Event('input'))
+            this.sliderY.dispatchEvent(new Event('input'))
+            this.sliderZ.dispatchEvent(new Event('input'))
         })
 
-        this.openFilterMenu.onclick = () => {
+        this.openFilterMenu.addEventListener('click', () => {
             this.controllerWrapper.style.visibility = ""
-        }
+        })
 
-        this.closeFilterMenu.onclick = () => {
+        this.closeFilterMenu.addEventListener('click', () => {
             this.controllerWrapper.style.visibility = "hidden"
-        }
+        })
 
-        //init display with default value
+        // Init display with default value
         this.displayX.textContent = this.sliderX.value.toString()
         this.displayY.textContent = this.sliderY.value.toString()
         this.displayZ.textContent = this.sliderZ.value.toString()
 
         // Update display when slider changes
-        this.sliderX.oninput = () => {
+        this.sliderX.addEventListener('input', () => {
             this.displayX.textContent = this.sliderX.value.toString()
-        }
-        this.sliderY.oninput = () => {
-            this.displayY.textContent = this.sliderY.value.toString()
-        }
-        this.sliderZ.oninput = () => {
-            this.displayZ.textContent = this.sliderZ.value.toString()
-        }
+        })
 
-        this.inputRotX.onchange = () => {
+        this.sliderY.addEventListener('input', () => {
+            this.displayY.textContent = this.sliderY.value.toString()
+        })
+
+        this.sliderZ.addEventListener('input', () => {
+            this.displayZ.textContent = this.sliderZ.value.toString()
+        })
+
+
+        this.inputRotX.addEventListener('change', () => {
             this.inputRotX.value = this.normaliseAngle(+this.inputRotX.value).toString()
-        }
-        this.inputRotZ.onchange = () => {
+        })
+
+        this.inputRotZ.addEventListener('change', () => {
             this.inputRotZ.value = this.normaliseAngle(+this.inputRotZ.value).toString()
-        }
+        })
+
+        // Register events to dispatch
+        this.filterCbx.addEventListener('change', () => {
+            this.dispatchEvent(new FilterToggleEvent(this.filterEnabled))
+
+            // TODO: register this with the filter-box checkbox, and only fire if it changes, considering filter checkbox
+            this.dispatchEvent(new FilterBoxToggleEvent(this.filterBoxEnabled))
+        })
     }
 
     private normaliseAngle(angle: number): number {
@@ -94,5 +111,18 @@ export default class Gui {
         }
 
         return normalisedAngle
+    }
+
+
+    addEventListener<K extends keyof GuiEventMap>(type: K, listener: (this: Gui, ev: GuiEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void {
+        this.eventTargetDeligate.addEventListener(type, listener as EventListener, options)
+    }
+
+    removeEventListener<K extends keyof GuiEventMap>(type: K, listener: (this: Gui, ev: GuiEventMap[K]) => any, options?: boolean | EventListenerOptions): void {
+        this.eventTargetDeligate.removeEventListener(type, listener as EventListener, options)
+    }
+
+    private dispatchEvent<E extends keyof GuiEventMap>(event: GuiEventMap[E]): boolean {
+        return this.eventTargetDeligate.dispatchEvent(event)
     }
 }
