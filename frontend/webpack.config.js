@@ -1,6 +1,10 @@
 const path = require('path')
+
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+const CopyPlugin = require("copy-webpack-plugin")
+
 
 const ARjs_THREE_Path = require.resolve('ar.js/three.js/build/ar')
 
@@ -34,6 +38,11 @@ module.exports = {
 		}
 	},
 	plugins: [
+		new CopyPlugin({
+			patterns: [
+				{ from: "assets", to: "assets" }
+			]
+		}),
 		new webpack.ProvidePlugin({ // Provide THREE for ar.js
 			THREE: 'three'
 		}),
