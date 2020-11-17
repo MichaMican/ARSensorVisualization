@@ -1,0 +1,50 @@
+\documentclass[titlepage]{scrartcl}
+
+% German support
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+
+%\usepackage[english]{babel}
+
+\usepackage{graphicx}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage[autostyle]{csquotes}
+
+% Make citations clickable
+\usepackage{hyperref}
+
+\usepackage{url}
+
+
+\bibliographystyle{plain}
+
+
+\begin{document}
+	\titlehead{Technische Hochschule Deggendorf}
+	\subject{Documentation}
+	\title{AR Sensor Visualisation}
+	%\subtitle{}
+	\author{Michael Mican\\Matrikel-Nr.: 692390 \and Maximilian Seitz\\Matrikel-Nr. 692807}
+	%\date{}
+	\publishers{Technische Hochschule Deggendorf\\Advisor: Prof. Dr. Peter Faber}
+	
+	\maketitle
+	
+	\tableofcontents
+	\pagebreak
+	
+	\include{sections/Intro}
+	\include{sections/Methods}
+	\include{sections/Results}
+	\include{sections/Outro}
+	
+	\pagebreak
+	\bibliography{bib}
+\end{document}
+
+
+
