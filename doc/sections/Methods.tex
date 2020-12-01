@@ -1,40 +1,54 @@
 \section{Methodik}
-
+Für die Realisation und das erreichen des Ziels musste ein Konkretes vorgehen und ein Grundsätzliche Architektur definiert werden. Hierfür spielten verschiedene Faktoren eine Rolle, welche im nachfolgenden beleuchtet werden.
 
 \subsection{Allgemeiner Aufbau}
+Da die Applikation von Grund auf entwickelt wird, wird der Allgemeine Aufbau von den beiden Entwicklern Maximilian Seitz und Michael Mican definiert. Der betreuende Professor Prof. Dr. Peter Faber fungiert während der Entwicklung als Project owner.
+
+\subsubsection{Projekt Vorgaben}
+Das Kernziel bestand in der Visualisierung von Vectoren im Dreidimensionalen raum, welche den gemessenen Magnetischenfluss eine flüssigen Metalls in echtzeit auf eine Sichverschlossene Kokille zu projizieren. Dies soll möglichst unkompliziert und Zugänglich ermöglicht werden, um auch kurzfristig ohne großen aufwand Besuchern und Gästen eine Benutzung zu ermöglichen. Aus diesem Grund wird eine Webbasierte Lösung umgesetzt, da so in der Theorie nur eine Webseite mit dem Smartphone besucht werden muss um die Applikation zu benutzen. In vorangehenden ähnlichen Projekten wurde deutlich, dass Übersichtlichkeit hierbei eine große Rolle spielt. Zur Lösung des Problems soll eine frei Bewegliche ebene mit definierbarer dicke im Vektorfeld bewegt werden können um so nur nach einem Ausschnitt der Daten intuitiv Filtern zu können. Da die Daten direkt vor Ort gemessen und Sicherheitsrelevant besitzen soll es möglich sein die Daten in einem lokalen Netzwerk zu Hosten um eine grundlegende IT - Sicherheit zu gewährleisten. Hierbei treten jedoch unter Berücksichtigung der anderen vorgaben Probleme auf.
 
 
-\subsubsection{Vorgaben von Faber}
-
-\begin{itemize}
-	\item Was will man visualiseren?
-	\begin{itemize}
-		\item Magnetischerfluss von Flüssigem metall in kokune
-		\item Soll dabei helfen die einlaufgeschwindigkeit zu regulieren
-	\end{itemize}
-	
-	\item Geschlossenes netzwerk
-	\begin{itemize}
-		\item Kein Internet zugriff
-	\end{itemize}
-	
-	\item Möglichkeit der filterung der visuellen Ergebnisse
-	\item Soll auf Handy ohne Einstellungen laufen\\
-		("Einfach auf website gehen und LETS GOOOOOO")
-\end{itemize}
+%\begin{itemize}
+%	\item Was will man visualiseren?
+%	\begin{itemize}
+%		\item Magnetischerfluss von Flüssigem metall in Kokille
+%		\item Soll dabei helfen die einlaufgeschwindigkeit zu regulieren
+%	\end{itemize}
+%	
+%	\item Geschlossenes netzwerk
+%	\begin{itemize}
+%		\item Kein Internet zugriff
+%	\end{itemize}
+%	
+%	\item Möglichkeit der filterung der visuellen Ergebnisse
+%	\item Soll auf Handy ohne Einstellungen laufen\\
+%		("Einfach auf website gehen und LETS GOOOOOO")
+%\end{itemize}
 
 
-\subsubsection{Probleme / Abweichungen von den Vorgaben}
+\subsubsection{Probleme und Abweichungen von den Vorgaben}
+Seit einigen Jahren können sogenannte "Powerful Features" nurnoch von Seiten mit "Secure origin", also zertifizierte HTTPS Seiten, genutzt werden. Diese Entscheidung fiel auf Grundlage technischer fortschritte, die es aus sicherheitsrelevanter Sicht nicht mehr vertretbar machte Funktionen wie Beispielsweise Geräteposition und Kamera von klassischen nicht zertifizierten HTTP Seiten zu ermöglichen (vgl The Chromium Projects \cite{CameraHTTPSOnly}). Die Datenübermittlung, welche von HTTPS genutzt wird macht es Angreifern schwerer solche kritische Daten ab zugreifen. Somit ist es erforderlich eine HTTPS Webseite für die Applikation zu nutzen. Daher wird die Frontend Seite über Github distributiert, wodurch sie ein HTTPS Zertifikat einer anerkannten Zertifizierungsstelle erwirbt. Diesem vertrauen Webbrowser Standardmäßig wodurch eine Manuelle Einstellung am Endgerät nicht getätigt werden muss.\\
+Dieses vorgehen führt zu einem weiterem Problem. Seit Anfang 2020 ermöglicht es Google Chrome standardmäßig nicht mehr HTTP quellen auf einer HTTPS Seite zu benutzen (vgl. Chromium Blog \cite{MixedSourcesPolicy}). Unter Berücksichtigung der Sicherheits vorgaben durch den Project Owner ist eine Einstellung am Endgerät unumgänglich. Hierfür gibt es zwei möglichkeiten.\\
+Einerseits kann, um den lokalen Daten host HTTP Server benutzen zu können, die Einstellung "Allow unsecure content" in den Browser Einstellungen auf "Allow" gesetzt werden. Hierdurch wird die Mixed Content policy ignoriert und HTTP quellen können auch auf der Seite benutzt werden. In Chrome Desktop kann diese Option in den Webseiteneinstellungen gefunden werden. Auf einem Smarphone hingegen muss hierfür der interne Settings link "\verb|chrome://flags/#unsafely-treat-insecure-origin-as-secure|" genutzt werden (siehe Abbildung \ref{fig:insecureOriginsSettings}).\\
+Die zweite Möglichkeit das Problem zu lösen erfordert eine eigene definierte HTTPS Zertifizierung des Daten Servers. Da diese Zertifizierung nicht via Internet geschehen kann muss hierfür ein eigenes Benutzerdefiniertes Zertifikat angelegt und am Endgerät, welches die Website aufruft, als bekanntes Zertifikat installiert werden.\\ 
+Nach Abstimmung mit dem Project Owner wird das Problem bis auf weiteres bei der Entwicklung nicht berücksichtigt. Stattdessen wird sowohl das Frontend alsauch das backend mit Simulierten Daten im Internet mit validen HTTPS zertifikaten gehostet.
 
-\begin{itemize}
-	\item HTTPS erforderlich für kamera
-	\begin{itemize}
-		\item Lokaler Host Server braucht SSL zertifikat - Manuelle trustung des Zertifikats am handy unumgänglich
-	\end{itemize}
-	
-	\item HTTPS oder unsecured source Einstellung für backend kommunikation erforderlich
-	\item=> Für Beispielzwecke beides HTTPS via Internet
-\end{itemize}
+\begin{figure}
+	\centering
+	\includegraphics[width=.75\linewidth]{images/InsecureOriginsSettings}
+	\caption{Allow insecure origin in Chrome mobile}
+	\label{fig:insecureOriginsSettings}
+\end{figure}
+
+%\begin{itemize}
+%	\item HTTPS erforderlich für kamera
+%	\begin{itemize}
+%		\item Lokaler Host Server braucht SSL zertifikat - Manuelle trustung des Zertifikats am handy unumgänglich
+%	\end{itemize}
+%	
+%	\item HTTPS oder unsecured source Einstellung für backend kommunikation erforderlich
+%	\item=> Für Beispielzwecke beides HTTPS via Internet
+%\end{itemize}
 
 
 \subsubsection{Komponenten}
