@@ -1,6 +1,6 @@
 import Backend from './backend'
 import { Plain3 } from './Data3D'
-import { FilterBoxToggleEvent, FilterToggleEvent, GuiEventMap } from './GuiEvents'
+import { FilterBoxToggleEvent, FilterChangeEvent, FilterToggleEvent, GuiEventMap } from './GuiEvents'
 
 export default class Gui {
 
@@ -19,7 +19,7 @@ export default class Gui {
     private readonly controllerWrapper: HTMLDivElement = document.getElementById("filterControlDisplay") as HTMLDivElement
     private readonly filterCbx: HTMLInputElement = document.getElementById("toggleFilter") as HTMLInputElement
 
-    private readonly eventTargetDeligate: EventTarget = new EventTarget()
+    private readonly eventTargetDelegate: EventTarget = new EventTarget()
 
     get filterPlain(): Plain3 {
         return new Plain3(
@@ -75,23 +75,28 @@ export default class Gui {
         // Update display when slider changes
         this.sliderX.addEventListener('input', () => {
             this.displayX.textContent = this.sliderX.value.toString()
+            this.dispatchFilterChangeEvent()
         })
 
         this.sliderY.addEventListener('input', () => {
             this.displayY.textContent = this.sliderY.value.toString()
+            this.dispatchFilterChangeEvent()
         })
 
         this.sliderZ.addEventListener('input', () => {
             this.displayZ.textContent = this.sliderZ.value.toString()
+            this.dispatchFilterChangeEvent()
         })
 
 
         this.inputRotX.addEventListener('change', () => {
-            this.inputRotX.value = this.normaliseAngle(+this.inputRotX.value).toString()
+			this.inputRotX.value = Gui.normaliseAngle(+this.inputRotX.value).toString()
+			this.dispatchFilterChangeEvent()
         })
 
         this.inputRotZ.addEventListener('change', () => {
-            this.inputRotZ.value = this.normaliseAngle(+this.inputRotZ.value).toString()
+			this.inputRotZ.value = Gui.normaliseAngle(+this.inputRotZ.value).toString()
+			this.dispatchFilterChangeEvent()
         })
 
         // Register events to dispatch
@@ -100,10 +105,16 @@ export default class Gui {
 
             // TODO: register this with the filter-box checkbox, and only fire if it changes, considering filter checkbox
             this.dispatchEvent(new FilterBoxToggleEvent(this.filterBoxEnabled))
+            
+            this.dispatchFilterChangeEvent()
         })
-    }
+	}
+	
+	private dispatchFilterChangeEvent() {
+		this.dispatchEvent(new FilterChangeEvent())
+	}
 
-    private normaliseAngle(angle: number): number {
+    private static normaliseAngle(angle: number): number {
         // Convert input to -180° - 180° range
         let normalisedAngle: number = (angle % 360 + 360) % 360;
         if (normalisedAngle > 180) {
@@ -112,17 +123,16 @@ export default class Gui {
 
         return normalisedAngle
     }
-
-
+    
     addEventListener<K extends keyof GuiEventMap>(type: K, listener: (this: Gui, ev: GuiEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void {
-        this.eventTargetDeligate.addEventListener(type, listener as EventListener, options)
+        this.eventTargetDelegate.addEventListener(type, listener as EventListener, options)
     }
 
     removeEventListener<K extends keyof GuiEventMap>(type: K, listener: (this: Gui, ev: GuiEventMap[K]) => any, options?: boolean | EventListenerOptions): void {
-        this.eventTargetDeligate.removeEventListener(type, listener as EventListener, options)
+        this.eventTargetDelegate.removeEventListener(type, listener as EventListener, options)
     }
 
-    private dispatchEvent<E extends keyof GuiEventMap>(event: GuiEventMap[E]): boolean {
-        return this.eventTargetDeligate.dispatchEvent(event)
+    dispatchEvent<E extends keyof GuiEventMap>(event: GuiEventMap[E]): boolean {
+        return this.eventTargetDelegate.dispatchEvent(event)
     }
 }

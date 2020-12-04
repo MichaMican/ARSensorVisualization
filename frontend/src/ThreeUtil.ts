@@ -2,7 +2,13 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import {
 	ArrowHelper as Arrow,
+	BoxGeometry,
+	Geometry,
 	Group,
+	Material,
+	Mesh,
+	MeshBasicMaterial,
+	MeshBasicMaterialParameters,
 	Object3D,
 	Renderer,
 	Vector3,
@@ -28,11 +34,33 @@ export function createRenderer(parentElement: Node): Renderer {
 	return renderer
 }
 
-export function createGroup(parent: Object3D): Group {
+export function createGroup(parent?: Object3D): Group {
 	const group = new Group()
-	parent.add(group)
+
+	if (parent) {
+		parent.add(group)
+	}
 
 	return group
+}
+
+export function createBox(
+	parent?: Object3D,
+	width?: number,
+	height?: number,
+	depth?: number,
+	meshParams?: MeshBasicMaterialParameters
+): Mesh<Geometry, Material> {
+	const box = new Mesh(
+		new BoxGeometry(width, height, depth),
+		new MeshBasicMaterial(meshParams)
+	)
+	
+	if (parent) {
+		parent.add(box)
+	}
+
+	return box
 }
 
 export function updatePositioning(root: Object3D, positioningUrl: string): void {

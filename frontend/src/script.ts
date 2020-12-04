@@ -8,11 +8,14 @@ import {
 	Camera,
 	Color,
 	Object3D,
+	Quaternion,
 	Scene,
 	Vector3
 } from 'three'
 
 import {
+	asVector3,
+	createBox,
 	createRenderer,
 	createGroup,
 	updatePositioning,
@@ -81,6 +84,17 @@ const root = createGroup(markerRoot)
 
 const arrowCloud = createArrowCloud(root, 10000)
 
+const filterBox = createBox(
+	root,
+	3,
+	3,
+	0.1,
+	{
+		transparent: true,
+		opacity: 0.5
+	}
+)
+
 updatePositioning(root, Backend.markerPositioning)
 
 loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', kokille => {
@@ -89,8 +103,25 @@ loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', kokille => {
 	updatePositioning(kokille, Backend.kokilleTransformation)
 })
 
-gui.addEventListener('filterboxtoggle', (e) => {
-	console.log("Filter box enabled:", e.filterBoxEnabled)
+gui.addEventListener('filterchange', () => {
+	const filterBoxEnabled = gui.filterBoxEnabled
+
+	filterBox.visible = filterBoxEnabled
+
+	if (filterBoxEnabled) {
+		const filterPlain = gui.filterPlain
+		const middlePoint = asVector3(filterPlain)
+		
+		// Move filter box to AR-root's origin,
+		// then look at plain's normal vector,
+		// relative to AR-root's origin.
+		// Then move the rotated filter box to
+		// the middle of plain.
+		filterBox.position.copy(new Vector3(0, 0, 0))
+		const normalPoint = root.localToWorld(filterPlain.nVector.clone())
+		filterBox.lookAt(normalPoint)
+		filterBox.position.copy(middlePoint)
+	}
 })
 
 let lines: Array<Line3> = []
