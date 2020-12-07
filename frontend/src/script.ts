@@ -21,7 +21,8 @@ import {
 } from './ThreeUtil'
 
 import { ArWrapper } from './ArWrapper'
-import { Line3 } from './Data3D'
+import {getLineLength, Line3} from './Data3D'
+import {Lut} from "three/examples/jsm/math/Lut";
 
 
 function createArrowCloud(
@@ -79,6 +80,7 @@ const markerRoot = ar.createMarkerRoot(scene, Backend.markerPattern)
 
 const root = createGroup(markerRoot)
 
+// Pool of arrows to reposition (as to not have to recreate them every frame)
 const arrowCloud = createArrowCloud(root, 10000)
 
 updatePositioning(root, Backend.markerPositioning)
@@ -87,6 +89,18 @@ loadModel(Backend.kokilleModelPath, 'kokille.obj', 'kokille.mtl', kokille => {
 	root.add(kokille)
 
 	updatePositioning(kokille, Backend.kokilleTransformation)
+})
+
+// Color range, mapping vector length to colors
+const arrowColors = new Lut('cooltowarm', 255)
+	.setMin(0)
+	.setMax(Number.POSITIVE_INFINITY)
+
+// Set limits of color mapping, depending on backend's vector length prediction
+Backend.getVectorLengthRange().then(vectorRange => {
+	arrowColors
+		.setMin(vectorRange.min)
+		.setMax(vectorRange.max)
 })
 
 let lines: Array<Line3> = []
@@ -105,6 +119,7 @@ run(() => {
 
 			if (line) {
 				arrow.visible = true
+				arrow.setColor(arrowColors.getColor(getLineLength(line)))
 				moveArrowToLine(arrow, line)
 			} else {
 				arrow.visible = false

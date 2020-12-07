@@ -20,17 +20,16 @@ input#toggleFilter{
     width: 30px;
 }
 
-button#openFilterMenu{
+button#openFilterMenu, button#closeFilterMenu{
     text-align: center;
-    position: fixed;
-    bottom: 0;
     width: 100%;
     height: 50px;
-    margin-bottom: 5px;
 }
 
-button#closeFilterMenu{
-    height: 50px;
+button#openFilterMenu{
+    position: fixed;
+    bottom: 0;
+    margin-bottom: 5px;
 }
 
 div.controllerWrapper {
@@ -39,13 +38,15 @@ div.controllerWrapper {
     bottom: 0;
     width: 100%;
     margin-bottom: 5px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.25);
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
 
 div.sliderWrapper {
     max-width: 900px;
     margin: auto;
 }
+
 div.inputWrapper {
     margin: auto;
 }

@@ -1,21 +1,19 @@
+import { getFromURL } from "./network"
 import { Line3 } from "./Data3D"
-import { DataMetaDat } from "./DataMetaDat"
+import { DataMetaDat, isDataMetaDat, isVectorRange, VectorRange } from "./MetaData"
 
 const backendURL = 'https://ardatatest.azurewebsites.net'
 
-async function getVectorDataFromURL(url: string) {
-	try {
-		const result = await fetch(url)
-		const linesJSON = await result.json()
 
-		if (linesJSON instanceof Array) {
-			return linesJSON
+async function getVectorDataFromURL(url: string) : Promise<Array<Line3>> {
+	return await getFromURL<Array<Line3>>(
+		url,
+		(value): value is Array<Line3> => value instanceof Array,
+		e => {
+			if (e) console.log(e)
+			return []
 		}
-	} catch (e) {
-		console.log(e)
-	}
-	
-	return []
+	)
 }
 
 export default {
@@ -24,8 +22,10 @@ export default {
 	cameraParameters: `${backendURL}/data/camera_para.dat`,
 	kokilleTransformation: `${backendURL}/data/kokilleTransformation.json`,
 	markerPositioning: `${backendURL}/data/positioning.json`,
+	vectorRange: `${backendURL}/data/vectorLengthRange.json`,
 	kokilleModelPath: `${backendURL}/data/model/`,
-
+	
+	// Dynamic files
 	data: `${backendURL}/api/data/v2`,
 	metaData: `${backendURL}/api/data/meta`,
 
@@ -58,8 +58,16 @@ export default {
     },
     
     async getMetaData(): Promise<DataMetaDat> {
-        const result = await fetch(this.metaData)
-        const metaJSON = await result.json()
-        return metaJSON
-    }
+	    return await getFromURL(this.metaData, isDataMetaDat, 'throw')
+    },
+	
+	async getVectorLengthRange() : Promise<VectorRange> {
+		return await getFromURL<VectorRange>(this.vectorRange, isVectorRange, e => {
+			if (e) console.log(e)
+			return {
+				min: 0,
+				max: Number.POSITIVE_INFINITY
+			}
+		})
+	}
 } as const
