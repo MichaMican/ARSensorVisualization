@@ -13,12 +13,16 @@ export interface Point3 {
 }
 
 export interface Line3 {
-	x?: Number,
-	y?: Number,
-	z?: Number,
-	xVec?: Number,
-	yVec?: Number,
-	zVec?: Number
+	x?: number,
+	y?: number,
+	z?: number,
+	xVec?: number,
+	yVec?: number,
+	zVec?: number
+}
+
+export function getLineLength(line: Line3) : number {
+	return new Vector3(line.xVec, line.yVec, line.zVec).length()
 }
 
 export class Plain3 {

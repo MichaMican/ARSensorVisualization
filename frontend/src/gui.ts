@@ -79,14 +79,14 @@ export default class Gui {
         }
 
         this.inputRotX.onchange = () => {
-            this.inputRotX.value = this.normaliseAngle(+this.inputRotX.value).toString()
+            this.inputRotX.value = Gui.normaliseAngle(+this.inputRotX.value).toString()
         }
         this.inputRotZ.onchange = () => {
-            this.inputRotZ.value = this.normaliseAngle(+this.inputRotZ.value).toString()
+            this.inputRotZ.value = Gui.normaliseAngle(+this.inputRotZ.value).toString()
         }
     }
 
-    private normaliseAngle(angle: number): number {
+    private static normaliseAngle(angle: number): number {
         // Convert input to -180° - 180° range
         let normalisedAngle: number = (angle % 360 + 360) % 360;
         if (normalisedAngle > 180) {
