@@ -59,10 +59,10 @@ namespace backend.Controllers
         {
             var vectors = _engine.GenerateVectors(MAX_VECTOR);
 
-            if(n1.HasValue || n2.HasValue || n3.HasValue || x.HasValue || y.HasValue || z.HasValue)
+            if (n1.HasValue || n2.HasValue || n3.HasValue || x.HasValue || y.HasValue || z.HasValue)
             {
                 //makes sure that all variables are set
-                if(!n1.HasValue || !n2.HasValue || !n3.HasValue || !x.HasValue || !y.HasValue || !z.HasValue)
+                if (!n1.HasValue || !n2.HasValue || !n3.HasValue || !x.HasValue || !y.HasValue || !z.HasValue)
                 {
                     return BadRequest("Please specify n1, n2, n3, x, y and z");
                 }
@@ -84,7 +84,7 @@ namespace backend.Controllers
                 vectors.RemoveRange(limit, vectors.Count - limit);
             }
 
-            return vectors;
+            return Ok(vectors);
         }
 
         [HttpGet("data")]
@@ -93,15 +93,15 @@ namespace backend.Controllers
             var returnList = _engine.GenerateVectors(MAX_VECTOR);
 
             //Filter Y axis
-            if(minY != null && maxY != null)
+            if (minY != null && maxY != null)
             {
                 returnList = returnList.Where((vector) => { return vector.y >= minY && vector.y <= maxY; }).ToList();
             }
-            else if(minY != null)
+            else if (minY != null)
             {
                 returnList = returnList.Where((vector) => { return vector.y >= minY; }).ToList();
             }
-            else if(maxY != null)
+            else if (maxY != null)
             {
                 returnList = returnList.Where((vector) => { return vector.y <= maxY; }).ToList();
             }
@@ -123,7 +123,7 @@ namespace backend.Controllers
             //Convert output to fullfill offset & limit
             if (offset != 0)
             {
-                if(offset >= returnList.Count)
+                if (offset >= returnList.Count)
                 {
                     returnList.Clear();
                 }
@@ -132,12 +132,12 @@ namespace backend.Controllers
                     returnList.RemoveRange(0, offset);
                 }
             }
-            if(returnList.Count > limit)
+            if (returnList.Count > limit)
             {
                 returnList.RemoveRange(limit, returnList.Count - limit);
             }
 
-            return returnList;
+            return Ok(returnList);
         }
     }
 }

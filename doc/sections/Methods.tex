@@ -2,7 +2,7 @@
 Für die Realisation und das erreichen des Ziels musste ein Konkretes vorgehen und ein Grundsätzliche Architektur definiert werden. Hierfür spielten verschiedene Faktoren eine Rolle, welche im nachfolgenden beleuchtet werden.
 
 \subsection{Allgemeiner Aufbau}
-Da die Applikation von Grund auf entwickelt wird, wird der Allgemeine Aufbau von den beiden Entwicklern Maximilian Seitz und Michael Mican definiert. Der betreuende Professor Prof. Dr. Peter Faber fungiert während der Entwicklung als Project owner.
+Da die Applikation von Grund auf entwickelt wird, wird der Allgemeine Aufbau von den beiden Entwicklern Maximilian Seitz und Michael Mican definiert. Der betreuende Professor Prof. Dr. Peter Faber fungiert während der Entwicklung als Project Owner.
 
 \subsubsection{Projekt Vorgaben}
 Das Kernziel bestand in der Visualisierung von Vectoren im Dreidimensionalen raum, welche den gemessenen Magnetischenfluss eine flüssigen Metalls in echtzeit auf eine Sichverschlossene Kokille zu projizieren. Dies soll möglichst unkompliziert und Zugänglich ermöglicht werden, um auch kurzfristig ohne großen aufwand Besuchern und Gästen eine Benutzung zu ermöglichen. Aus diesem Grund wird eine Webbasierte Lösung umgesetzt, da so in der Theorie nur eine Webseite mit dem Smartphone besucht werden muss um die Applikation zu benutzen. In vorangehenden ähnlichen Projekten wurde deutlich, dass Übersichtlichkeit hierbei eine große Rolle spielt. Zur Lösung des Problems soll eine frei Bewegliche ebene mit definierbarer dicke im Vektorfeld bewegt werden können um so nur nach einem Ausschnitt der Daten intuitiv Filtern zu können. Da die Daten direkt vor Ort gemessen und Sicherheitsrelevant besitzen soll es möglich sein die Daten in einem lokalen Netzwerk zu Hosten um eine grundlegende IT - Sicherheit zu gewährleisten. Hierbei treten jedoch unter Berücksichtigung der anderen vorgaben Probleme auf.
@@ -27,9 +27,9 @@ Das Kernziel bestand in der Visualisierung von Vectoren im Dreidimensionalen rau
 
 
 \subsubsection{Probleme und Abweichungen von den Vorgaben}
-Seit einigen Jahren können sogenannte \"Powerful Features\" nurnoch von Seiten mit \"Secure origin\", also zertifizierte HTTPS Seiten, genutzt werden. Diese Entscheidung fiel auf Grundlage technischer fortschritte, die es aus sicherheitsrelevanter Sicht nicht mehr vertretbar machte Funktionen wie Beispielsweise Geräteposition und Kamera von klassischen nicht zertifizierten HTTP Seiten zu ermöglichen (vgl The Chromium Projects \cite{CameraHTTPSOnly}). Die Datenübermittlung, welche von HTTPS genutzt wird macht es Angreifern schwerer solche kritische Daten ab zugreifen. Somit ist es erforderlich eine HTTPS Webseite für die Applikation zu nutzen. Daher wird die Frontend Seite über Github distributiert, wodurch sie ein HTTPS Zertifikat einer anerkannten Zertifizierungsstelle erwirbt. Diesem vertrauen Webbrowser Standardmäßig wodurch eine Manuelle Einstellung am Endgerät nicht getätigt werden muss.\\
+Seit einigen Jahren können sogenannte \grqq Powerful Features\grqq\space nurnoch von Seiten mit \grqq Secure origin\grqq , also zertifizierte HTTPS Seiten, genutzt werden. Diese Entscheidung fiel auf Grundlage technischer fortschritte, die es aus sicherheitsrelevanter Sicht nicht mehr vertretbar machte Funktionen wie Beispielsweise Geräteposition und Kamera von klassischen nicht zertifizierten HTTP Seiten zu ermöglichen (vgl The Chromium Projects \cite{CameraHTTPSOnly}). Die Datenübermittlung, welche von HTTPS genutzt wird macht es Angreifern schwerer solche kritische Daten ab zugreifen. Somit ist es erforderlich eine HTTPS Webseite für die Applikation zu nutzen. Daher wird die Frontend Seite über Github distributiert, wodurch sie ein HTTPS Zertifikat einer anerkannten Zertifizierungsstelle erwirbt. Diesem vertrauen Webbrowser Standardmäßig wodurch eine Manuelle Einstellung am Endgerät nicht getätigt werden muss.\\
 Dieses vorgehen führt zu einem weiterem Problem. Seit Anfang 2020 ermöglicht es Google Chrome standardmäßig nicht mehr HTTP quellen auf einer HTTPS Seite zu benutzen (vgl. Chromium Blog \cite{MixedSourcesPolicy}). Unter Berücksichtigung der Sicherheits vorgaben durch den Project Owner ist eine Einstellung am Endgerät unumgänglich. Hierfür gibt es zwei möglichkeiten.\\
-Einerseits kann, um den lokalen Daten host HTTP Server benutzen zu können, die Einstellung \"Allow unsecure content\" in den Browser Einstellungen auf \"Allow\" gesetzt werden. Hierdurch wird die Mixed Content policy ignoriert und HTTP quellen können auch auf der Seite benutzt werden. In Chrome Desktop kann diese Option in den Webseiteneinstellungen gefunden werden. Auf einem Smarphone hingegen muss hierfür der interne Settings link \verb|"chrome://flags/#unsafely-treat-insecure-origin-as-secure"| genutzt werden (siehe Abbildung \ref{fig:insecureOriginsSettings}).\\
+Einerseits kann, um den lokalen Daten host HTTP Server benutzen zu können, die Einstellung \grqq Allow unsecure content\grqq\space in den Browser Einstellungen auf \grqq Allow\grqq\space gesetzt werden. Hierdurch wird die Mixed Content policy ignoriert und HTTP quellen können auch auf der Seite benutzt werden. In Chrome Desktop kann diese Option in den Webseiteneinstellungen gefunden werden. Auf einem Smarphone hingegen muss hierfür der interne Settings link \verb|"chrome://flags/#unsafely-treat-insecure-origin-as-secure"| genutzt werden (siehe Abbildung \ref{fig:insecureOriginsSettings}).\\
 Die zweite Möglichkeit das Problem zu lösen erfordert eine eigene definierte HTTPS Zertifizierung des Daten Servers. Da diese Zertifizierung nicht via Internet geschehen kann muss hierfür ein eigenes Benutzerdefiniertes Zertifikat angelegt und am Endgerät, welches die Website aufruft, als bekanntes Zertifikat installiert werden.\\ 
 Nach Abstimmung mit dem Project Owner wird das Problem bis auf weiteres bei der Entwicklung nicht berücksichtigt. Stattdessen wird sowohl das Frontend alsauch das backend mit Simulierten Daten im Internet mit validen HTTPS zertifikaten gehostet.
 
@@ -104,76 +104,77 @@ Nach Abstimmung mit dem Project Owner wird das Problem bis auf weiteres bei der 
 
 \subsection{Daten bereitstellung/Backend}
 
-Zur Bereitstellung der Daten wird eine REST API implementiert. Über diese API kann das frontend alle Usecase spezifischen Daten abrufen (siehe Abbildung \ref{fig:backendUseCase}). Somit kann das selbe frontend durch eine einfach Änderung der API url an mehren Orten verwendet werden. Alle Antworten der API sind in JSON codiert, da JSON besser für dynamische Webapplikationen und einfachen Datentransfer geeignet ist als andere ähnliche Datenformate wie XML (vgl. Šimec \cite{comparisonJsonXml}).
+Zur Bereitstellung der Daten wird eine REST API implementiert. Über diese API kann das 
+Frontend alle Usecase spezifischen Daten abrufen (siehe Abbildung \ref{fig:backendUseCase}). Somit kann das selbe frontend durch eine einfach Änderung der API url an mehren Orten verwendet werden. Alle Antworten der API sind in JSON codiert, da JSON besser für dynamische Webapplikationen und einfachen Datentransfer geeignet ist als andere ähnliche Datenformate wie XML (vgl. Šimec \cite{comparisonJsonXml}).
 Grundsätzlich müssen 2 wichtige Endpunkte implementiert werden und ein Endpunkt zur Datenbereitstellung verfügbar gemacht werden.\\
 Der Datenbereitstellungs-Endpunkt hostet die eingangs erwähnten usecase spezifischen statischen Dateien. Hierzu zählen die model spezifischen Daten, welche die Visuelle representation und texturierung der kokille darstellellen, die settings und parameter für die camera und das markerpattern und Informationen zu positionierung und skalierung der echten kokille relativ zum marker.\\
 Die beiden anderen Endpunkte bewegen sich um die tatsächlichen gemessenen Vektordaten. Sie bieten die Möglichkeit über eine GET Schnittstelle die Vektordaten zu holen und über eine weitere GET Schnittstelle die Metadaten dieser Vektoren, wie die Anzahl und die jeweiligen min und max x,y und z werte der Vektoren, zu beziehen. Darüber hinaus ist es möglich bei der Datenabfrage über Query Parameter einen Einheitsvektor und eine Distanz mitzugeben, welche eine Filterebene definiert, sodass nur Vektoren innerhalb der definierten Distanz von dieser Filterebene zurückgegeben werden.\\
-Diese Endpunkte müssen anderen Seiten und Domänen abgefragt werden können. Aufgrund von Cross-Origin Resource Sharing Policies (CORS) ist hierfür ein spezielles vorgehen erforderlich. Der Client sendet bei seiner anfrage im \"Origin\" Header seine Domäne mit. Der Server muss diese Domäne akzeptieren und in seiner Antwort den \"Access-Control-Allow-Origin\" Header mit der jeweiligen Domäne oder einem \"*\" befüllen (vgl. Kesteren \cite{van2014cross}). Der hier implementierte backend Server gibt immer einen \"Access-Control-Allow-Origin\" Header mit dem wert \"*\" zurück, wodurch jegliche Seiten und Domänen die Datenakquirieren können. Dies kann aber im Anwendungsfall aus sicherheitstechnischen gründen geändert werden müssen.
+Diese Endpunkte müssen anderen Seiten und Domänen abgefragt werden können. Aufgrund von Cross-Origin Resource Sharing Policies (CORS) ist hierfür ein spezielles vorgehen erforderlich. Der Client sendet bei seiner anfrage im \grqq Origin\grqq\space Header seine Domäne mit. Der Server muss diese Domäne akzeptieren und in seiner Antwort den \grqq Access-Control-Allow-Origin\grqq\space Header mit der jeweiligen Domäne oder einem \grqq *\grqq\space befüllen (vgl. Kesteren \cite{van2014cross}). Der hier implementierte backend Server gibt immer einen \grqq Access-Control-Allow-Origin\grqq\space Header mit dem wert \grqq *\grqq\space zurück, wodurch jegliche Seiten und Domänen die Datenakquirieren können. Dies kann aber im Anwendungsfall aus sicherheitstechnischen gründen geändert werden müssen.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=.80\linewidth]{images/backend/APIUseCases}
+	\includegraphics[width=.75\linewidth]{images/backend/APIUseCases}
 	\caption{API use cases.}
 	\label{fig:backendUseCase}
 \end{figure}
 
 
-\begin{enumerate}
-	\item REST (REST conforme endpunkte)
-	\item JSON (quote his paper)
-	\item Aufbau
-	\begin{itemize}
-		\item Architektur
-		\begin{itemize}
-			\item Endpunkte (evtl als diagram (Usecase))
-			\begin{itemize}
-				\item GET /api/data
-				\begin{itemize}
-					\item Gibt Vector Daten im JSON format zurück
-				\end{itemize}
-				
-				\item GET /api/data/v2
-				\begin{itemize}
-					\item Gibt Vector Daten im JSON format zurück und unterstützt filterung
-				\end{itemize}
-				
-				\item GET /api/data/meta
-				\begin{itemize}
-					\item Gibt Informationen über zur verfügung gestellte daten zurück
-					\item (anzahl vektoren im Datensatz, min \& max werte für axen)
-				\end{itemize}
-			\end{itemize}
-			
-			\item Hosten der Static files
-			\begin{itemize}
-				\item /hiro.patt
-				\item /kokilleTransformation.JSON
-				\item /positioning.JSON
-				\item /camera\_para.dat
-				\begin{itemize}
-					\item allgemeine camera parameter (von AR js mit ausgesendet)
-					\item idealterweise jede camera eigene parameter (utopie)
-				\end{itemize}
-				
-				\item /model
-				\begin{itemize}
-					\item /kokille.mtl
-					\item /kokille.obj
-				\end{itemize}
-			\end{itemize}
-		\end{itemize}
-			
-		\item CORS
-		\begin{itemize}
-			\item Nötig damit api von anderen websiten aufgerufen werden kann
-			\item Prinzip:
-			\begin{itemize}
-				\item Client schickt Origin Header mit
-				\item Wenn Origin zu der liste der zugelassenen Hosts ist wird bei der antwort der Allow-Origin Header gesetzt
-			\end{itemize}
-		\end{itemize}
-	\end{itemize}
-\end{enumerate}
+%\begin{enumerate}
+%	\item REST (REST conforme endpunkte)
+%	\item JSON (quote his paper)
+%	\item Aufbau
+%	\begin{itemize}
+%		\item Architektur
+%		\begin{itemize}
+%			\item Endpunkte (evtl als diagram (Usecase))
+%			\begin{itemize}
+%				\item GET /api/data
+%				\begin{itemize}
+%					\item Gibt Vector Daten im JSON format zurück
+%				\end{itemize}
+%				
+%				\item GET /api/data/v2
+%				\begin{itemize}
+%					\item Gibt Vector Daten im JSON format zurück und unterstützt filterung
+%				\end{itemize}
+%				
+%				\item GET /api/data/meta
+%				\begin{itemize}
+%					\item Gibt Informationen über zur verfügung gestellte daten zurück
+%					\item (anzahl vektoren im Datensatz, min \& max werte für axen)
+%				\end{itemize}
+%			\end{itemize}
+%			
+%			\item Hosten der Static files
+%			\begin{itemize}
+%				\item /hiro.patt
+%				\item /kokilleTransformation.JSON
+%				\item /positioning.JSON
+%				\item /camera\_para.dat
+%				\begin{itemize}
+%					\item allgemeine camera parameter (von AR js mit ausgesendet)
+%					\item idealterweise jede camera eigene parameter (utopie)
+%				\end{itemize}
+%				
+%				\item /model
+%				\begin{itemize}
+%					\item /kokille.mtl
+%					\item /kokille.obj
+%				\end{itemize}
+%			\end{itemize}
+%		\end{itemize}
+%			
+%		\item CORS
+%		\begin{itemize}
+%			\item Nötig damit api von anderen websiten aufgerufen werden kann
+%			\item Prinzip:
+%			\begin{itemize}
+%				\item Client schickt Origin Header mit
+%				\item Wenn Origin zu der liste der zugelassenen Hosts ist wird bei der antwort der Allow-Origin Header gesetzt
+%			\end{itemize}
+%		\end{itemize}
+%	\end{itemize}
+%\end{enumerate}
 
 
 

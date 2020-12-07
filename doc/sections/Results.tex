@@ -42,6 +42,44 @@
 
 \subsection{Implementierung des Backends}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{images/backend/classDiagram}
+	\caption{System Klassen, Dto Klassen und Controller und Engine Klassen}
+	\label{fig:ClassDiagram}
+\end{figure}
+
+Die Backend API wird in Asp.NetCore (C\#) implementiert. Das Framework wurde gewählt, da es kostenlos und opensource ist und da es sowohl auf Linux als auch auf Windows lauffähig ist (vgl. DotNet Download page \cite{DotNetDownloadPage}). Außerdem liefert NetCore mit ASP nativ eine IIS Webapplikation Funktionalität mit, sodass die API schnell und einfach umzusetzen ist, ohne einen großen web hosting overhead zu erzeugen. Grundsätzlich besteht das Programm aus drei Klassen Gruppen, den System Klassen, den Controller und Engine Klassen und den data transfer object (Dto) Klassen (siehe Abbildung \ref{fig:ClassDiagram}).\\
+Die Klasse Programm besitzt vordefinierten code zur Instanziierung des WebHosts.
+
+\begin{codefig}
+	\centering
+	\lstset{style=sharpc}
+	\begin{lstlisting}
+ public static void Main(string[] args)
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+            var serSet = new ServerSettings();
+
+            config.GetSection("ServerSettings").Bind(serSet);
+
+            CreateHostBuilder(args, serSet).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args, ServerSettings serverSettings) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls(serverSettings.HostIp);
+                });
+	\end{lstlisting}
+	\caption{Methoden der Program Klasse}
+	\label{codefig:Program.cs}
+\end{codefig}
+
 \begin{itemize}
 	\item Framework: Netcore (C\#)
 	\begin{itemize}
