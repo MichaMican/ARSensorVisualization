@@ -15,33 +15,15 @@ namespace backend.Controllers
         private const int MAX_VECTOR = 3200;
         private IDefaultEngine _engine;
 
-        public DefaultController()
+        public DefaultController(IDefaultEngine engine)
         {
-            _engine = new DefaultEngine();
+            _engine = engine;
         }
 
         [HttpGet("data/meta")]
         public ActionResult<VectorDataMetaData> GetVectorMetaData()
         {
-            var vectors = _engine.GenerateVectors(MAX_VECTOR);
-            var xMin = vectors.Min((v) => v.x);
-            var yMin = vectors.Min((v) => v.y);
-            var zMin = vectors.Min((v) => v.z);
-            var xMax = vectors.Max((v) => v.x);
-            var yMax = vectors.Max((v) => v.y);
-            var zMax = vectors.Max((v) => v.z);
-            var totalVectors = vectors.Count;
-
-            return new VectorDataMetaData()
-            {
-                totalVecotrs = totalVectors,
-                xMin = xMin,
-                yMin = yMin,
-                zMin = zMin,
-                xMax = xMax,
-                yMax = yMax,
-                zMax = zMax
-            };
+            return _engine.GetVectorMetaData();
         }
 
         /*
@@ -55,13 +37,13 @@ namespace backend.Controllers
          * maxDist = 0.5: maximal Distance of returned vector bases to plain
          */
         [HttpGet("data/v2")]
-        public ActionResult<List<VectorDto>> GetVectorCollectionV2(int limit = MAX_VECTOR, double? n1 = null, double? n2 = null, double? n3 = null, double? x = null, double? y = null, double? z = null, double maxDist = 0.5)
+        public ActionResult<List<VectorDto>> GetVectorCollectionV2(int limit = 100, int offset = 0, double? n1 = null, double? n2 = null, double? n3 = null, double? x = null, double? y = null, double? z = null, double maxDist = 0.5)
         {
-            var vectors = _engine.GenerateVectors(MAX_VECTOR);
+            var vectors = _engine.GetAllVectors();
 
             if (n1.HasValue || n2.HasValue || n3.HasValue || x.HasValue || y.HasValue || z.HasValue)
             {
-                //makes sure that all variables are set
+                //makes sure that all variables are set if at least one is set
                 if (!n1.HasValue || !n2.HasValue || !n3.HasValue || !x.HasValue || !y.HasValue || !z.HasValue)
                 {
                     return BadRequest("Please specify n1, n2, n3, x, y and z");
@@ -79,6 +61,17 @@ namespace backend.Controllers
                 vectors = _engine.FilterVectors(vectors, plainVector, 0.5);
             }
 
+            if(offset > 0)
+            {
+                //this prevents the following RemoveRange to throw an ArgumentOutOfRangeExcenption when user provides an invalid/to big offset
+                if(offset >= vectors.Count)
+                {
+                    return Ok(new List<VectorDto>());
+                }
+
+                vectors.RemoveRange(0, offset);
+            }
+
             if (vectors.Count > limit)
             {
                 vectors.RemoveRange(limit, vectors.Count - limit);
@@ -90,7 +83,7 @@ namespace backend.Controllers
         [HttpGet("data")]
         public ActionResult<List<VectorDto>> GetVectorCollection(int limit = MAX_VECTOR, int offset = 0, int? minY = null, int? maxY = null, int? minX = null, int? maxX = null)
         {
-            var returnList = _engine.GenerateVectors(MAX_VECTOR);
+            var returnList = _engine.GetAllVectors();
 
             //Filter Y axis
             if (minY != null && maxY != null)
