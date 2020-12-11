@@ -53,17 +53,36 @@ Nach Abstimmung mit dem Project Owner wird das Problem bis auf weiteres bei der 
 
 \subsubsection{Komponenten}
 
-\begin{itemize}
-	\item Backend vs. Frontend
-	\begin{itemize}
-		\item Frontend: AR visualisierung (allgemein)
-		\item Backend: Implementierungs spezifizierung
-		\item ziel: Frontend kann mit verschiedenen Backends genutzt werden
-	\end{itemize}
-\end{itemize}
+Um Komponenten austauschbar zu machen, und Wiederverwendung davon zu
+ermöglichen, wurde eine Architektur mir einem Frontend und Backend
+gewählt. Dabei übernimmt das Frontend die Visualisierung der Daten,
+in der Form einer Website, die die Daten, welche Angezeigt werden,
+von einem Server einholt, der das Backend bildet.
+
+Dabei werden die Aufgaben so verteilt, dass das Frontend unabhängig
+vom genauen Anwendungsgebiet ist, zu welchem ihm das Backend alle
+Informationen über eine API zur Verfügung stellt.
+
+Um dies zu Ermöglichen, wird die Funktionalität auf ihre abstrakten
+Bestandteile reduziert, die dann vom Frontend unterstützt wird.
+Diese Teile sind die Anzeige von einem Vektorfeld, und einem
+3D-Modell der Umgebung, projiziert auf die echte Welt, durch die
+Kamera. Synchronisierung findet hierzu über einen AR-Marker statt.
+Diese Funktionalitäten sind die Voraussetzung, welche jedoch
+erweitert werden, um das Nutzen der Anwendung zu erleichtern.
+Jegliche solche Änderungen sind in Kapitel \ref{section:Frontend}
+beschrieben. Die vorausgesetzten Kommunikationsschnittstellen werden
+in Kapitel \ref{section:Backend} genauer beschrieben.
+
+Durch diese Architektur, ist ein Austausch des Backends möglich,
+was Visualisierung anderer Daten erlaubt. Diese Datenquellen können
+beispielsweise Luftströme um ein Objekt anzeigen, zuvor aufgenommene
+Daten wiedergeben, oder Abwärme simulieren. Das Frontend ist dazu
+fähig auch solche Daten, mit den selben mitteln, an zu zeigen.
 
 
 \subsection{Visualisierung/Frontend}
+\label{section:Frontend}
 
 \begin{figure}
 	\centering
@@ -103,6 +122,7 @@ Nach Abstimmung mit dem Project Owner wird das Problem bis auf weiteres bei der 
 
 
 \subsection{Daten bereitstellung/Backend}
+\label{section:Backend}
 
 Zur Bereitstellung der Daten wird eine REST API implementiert. Über diese API kann das 
 Frontend alle Usecase spezifischen Daten abrufen (siehe Abbildung \ref{fig:backendUseCase}). Somit kann das selbe frontend durch eine einfach Änderung der API url an mehren Orten verwendet werden. Alle Antworten der API sind in JSON codiert, da JSON besser für dynamische Webapplikationen und einfachen Datentransfer geeignet ist als andere ähnliche Datenformate wie XML (vgl. Šimec \cite{comparisonJsonXml}).
