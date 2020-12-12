@@ -8,13 +8,9 @@
 %\usepackage[english]{babel}
 
 \usepackage{graphicx}
-\usepackage{listings}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{float}
-
-\floatstyle{plain}
-\newfloat{codefig}{H}{lop}
-\floatname{codefig}{Code}
+\usepackage{placeins}
 
 \usepackage{caption}
 \usepackage{subcaption}
@@ -27,19 +23,11 @@
 \usepackage{url}
 
 
+\input{lib/codelistings}
+
+
 \bibliographystyle{plain}
 
-\lstdefinestyle{sharpc}{
-	language=[Sharp]C,
-	frame=lr,
-	rulecolor=\color{blue!80!black},
-	numbers=left,
-    stepnumber=1,
-    showstringspaces=false,
-    tabsize=1,
-    breaklines=true,
-    breakatwhitespace=false,
-}
 
 \begin{document}
 	\titlehead{Technische Hochschule Deggendorf}

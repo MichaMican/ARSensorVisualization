@@ -1,0 +1,71 @@
+\usepackage{listings}
+
+\floatstyle{plain}
+\newfloat{codefig}{H}{lop}
+\floatname{codefig}{Code}
+
+% Define JavaScript as language for listings
+\lstdefinelanguage{JavaScript}{
+	keywords={
+		typeof,
+		new,
+		true,
+		false,
+		function,
+		null,
+		var,
+		let,
+		const,
+		in,
+		is,
+		async,
+		instanceof
+	},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywords={
+		return,
+		if,
+		while,
+		do,
+		else,
+		catch,
+		switch,
+		case,
+		break,
+		class,
+		export,
+		boolean,
+		throw,
+		implements,
+		import,
+		this,
+		await
+	},
+	ndkeywordstyle=\color{purple}\bfseries,
+	identifierstyle=\color{black},
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{ForestGreen}\ttfamily,
+	stringstyle=\color{red}\ttfamily,
+	morestring=[b]',
+	morestring=[b]",
+	morestring=[b]`
+}
+
+\lstset{
+	frame=lr,
+	rulecolor=\color{blue!80!black},
+	tabsize=2,
+    stepnumber=1,
+    breakatwhitespace=false,
+    showstringspaces=false,
+	extendedchars=true,
+	numbers=left,
+	breaklines=true
+}
+
+\lstdefinestyle{sharpc}{
+	language=[Sharp]C,
+    tabsize=1
+}
