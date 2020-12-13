@@ -275,13 +275,15 @@ public DefaultEngineV2(IOptions<AppSettings> settings)
 \end{codeblock}
 
 Dieses Settings Objekt ist erforderlich, da es den Pfad zu der Datei
-beinhaltet, welche die Vektordaten enthält. Dieser Pfad wird von der
-Methode \grqq GetAllVectors\grqq\space an die private Methode
-\grqq LoadVectorsFromJsonFile\grqq\space weitergegeben, welche
-wiederum mithilfe des \grqq StreamReaders\grqq\space zunächst die
-Datei einliest und anschließend mit \grqq JsonConvert\grqq\space
-in eine Liste an VectorDto Objekten paarst.
-(vgl. Code \ref{code:GetAllVectors})
+beinhaltet, welche die Vektordaten enthält. Diese Datei muss eine JSON
+Datei sein, welche aus einem Array mit Vektorobjekten besteht.
+Der Aufbau ist hier der Selbe, wie die JSON Antworten des Backends
+(siehe Code \ref{code:VecJSON}). Dieser Pfad wird von der Methode
+\grqq GetAllVectors\grqq\space an die private Methode
+\grqq LoadVectorsFromJsonFile\grqq\space weitergegeben, welche wiederum
+mithilfe des \grqq StreamReaders\grqq\space zunächst die Datei einliest
+und ansachließend mit \grqq JsonConvert\grqq\space in eine Liste an
+VectorDto Objekten paarst. (vgl. Code \ref{code:GetAllVectors})
 
 \begin{codeblock}
 	\begin{lstlisting}[

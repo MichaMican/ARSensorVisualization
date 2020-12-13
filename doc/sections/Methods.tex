@@ -200,9 +200,39 @@ zu erstellen und zerstören.
 \subsection{Daten bereitstellung/Backend}
 \label{section:Backend}
 
-Zur Bereitstellung der Daten wird eine REST API implementiert. Über diese API kann das 
-Frontend alle Usecase spezifischen Daten abrufen (siehe Abbildung \ref{fig:backendUseCase}). Somit kann das selbe frontend durch eine einfach Änderung der API url an mehren Orten verwendet werden. Alle Antworten der API sind in JSON codiert, da JSON besser für dynamische Webapplikationen und einfachen Datentransfer geeignet ist als andere ähnliche Datenformate wie XML (vgl. Šimec \cite{comparisonJsonXml}).
-Grundsätzlich müssen 2 wichtige Endpunkte implementiert werden und ein Endpunkt zur Datenbereitstellung verfügbar gemacht werden.\\
+Zur Bereitstellung der Daten wird eine REST API implementiert.
+Über diese API kann das Frontend alle Usecase spezifischen Daten
+abrufen (siehe Abbildung \ref{fig:backendUseCase}). Somit kann das
+selbe frontend durch eine einfach Änderung der API url an mehren
+Orten verwendet werden. Alle Antworten der API sind in JSON codiert,
+da JSON besser für dynamische Webapplikationen und einfachen
+Datentransfer geeignet ist als andere ähnliche Datenformate wie
+XML (vgl. Šimec \cite{comparisonJsonXml}). Die Vektordaten werden
+als Array zurückgegeben. Jedes Vektorobjekt besitzt jeweils eine
+x, y, z, xVec, yVec und zVec Property (Siehe Code \ref{code:VecJSON}).
+Sie definieren den Fußpunkt des Vektors (x, y, z) und die Richtung
+des Vektors (xVec, yVec, zVec).
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		language=json,
+		caption={Aufbau der Vektordaten JSON},
+		label={code:VecJSON}
+	]
+[
+	{
+		"x": float,
+		"y": float,
+		"z": float,
+		"xVec": float,
+		"yVec": float,
+		"zVec": float
+	}
+]
+	\end{lstlisting}
+\end{codeblock}
+
+Grundsätzlich müssen 2 wichtige Endpunkte implementiert werden und ein Endpunkt zur Datenbereitstellung verfügbar gemacht werden.
 Der Datenbereitstellungs-Endpunkt hostet die eingangs erwähnten usecase spezifischen statischen Dateien. Hierzu zählen die model spezifischen Daten, welche die Visuelle representation und texturierung der kokille darstellellen, die settings und parameter für die camera und das markerpattern und Informationen zu positionierung und skalierung der echten kokille relativ zum marker.\\
 Die beiden anderen Endpunkte bewegen sich um die tatsächlichen gemessenen Vektordaten. Sie bieten die Möglichkeit über eine GET Schnittstelle die Vektordaten zu holen und über eine weitere GET Schnittstelle die Metadaten dieser Vektoren, wie die Anzahl und die jeweiligen min und max x,y und z werte der Vektoren, zu beziehen. Darüber hinaus ist es möglich bei der Datenabfrage über Query Parameter einen Einheitsvektor und eine Distanz mitzugeben, welche eine Filterebene definiert, sodass nur Vektoren innerhalb der definierten Distanz von dieser Filterebene zurückgegeben werden.\\
 Diese Endpunkte müssen anderen Seiten und Domänen abgefragt werden können. Aufgrund von Cross-Origin Resource Sharing Policies (CORS) ist hierfür ein spezielles vorgehen erforderlich. Der Client sendet bei seiner anfrage im \grqq Origin\grqq\space Header seine Domäne mit. Der Server muss diese Domäne akzeptieren und in seiner Antwort den \grqq Access-Control-Allow-Origin\grqq\space Header mit der jeweiligen Domäne oder einem \grqq *\grqq\space befüllen (vgl. Kesteren \cite{van2014cross}). Der hier implementierte backend Server gibt immer einen \grqq Access-Control-Allow-Origin\grqq\space Header mit dem wert \grqq *\grqq\space zurück, wodurch jegliche Seiten und Domänen die Datenakquirieren können. Dies kann aber im Anwendungsfall aus sicherheitstechnischen gründen geändert werden müssen.
