@@ -191,7 +191,7 @@ public DefaultEngineV2(IOptions<AppSettings> settings)
 	\caption{Konstruktor der DefaultEngine Klasse}
 	\label{codefig:DefaultEngineConstructor}
 \end{codefig}
-Dieses Settings Objekt ist erforderlich, da es den Pfad zu der Datei beinhaltet, welche die Vektordaten enthält. Dieser Pfad wird von der Methode \grqq GetAllVectors\grqq\space an die private Methode \grqq LoadVectorsFromJsonFile\grqq\space weitergegeben, welche wiederrum mithilfe des \grqq StreamReaders\grqq\space zunächst die datei einliest und ansachließend mit \grqq JsonConvert\grqq\space in eine Liste an VectorDto objekten parst. (vgl. Code \ref{codefig:GetAllVectors})
+Dieses Settings Objekt ist erforderlich, da es den Pfad zu der Datei beinhaltet, welche die Vektordaten enthält. Diese Datei muss eine JSON Datei sein, welche aus einem Array mit Vektorobjekten besteht. Der Aufbau ist hier der Selbe, wie die JSON Antworten des Backends (siehe Code \ref{codefig:VecJSON}). Dieser Pfad wird von der Methode \grqq GetAllVectors\grqq\space an die private Methode \grqq LoadVectorsFromJsonFile\grqq\space weitergegeben, welche wiederrum mithilfe des \grqq StreamReaders\grqq\space zunächst die datei einliest und ansachließend mit \grqq JsonConvert\grqq\space in eine Liste an VectorDto objekten parst. (vgl. Code \ref{codefig:GetAllVectors})
 \begin{codefig}
 	\centering
 	\lstset{style=sharpc}
