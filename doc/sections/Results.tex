@@ -3,43 +3,309 @@
 
 \subsection{Implementierung des Frontends}
 
-\begin{itemize}
-	\item Tools
-	\begin{itemize}
-	
-		\item TypeScript
-		\begin{itemize}
-			\item Typ-Sichere version von JavaScript
-			\item Compiliert auf JavaScript
-		\end{itemize}
-		
-		\item npm
-		\begin{itemize}
-			\item Three.js als dependency
-			\item AR.js von github
-			\begin{itemize}
-				\item TypeScript declaration file
-			\end{itemize}
-		\end{itemize}
-		
-		\item webpack
-	\end{itemize}
-	
-	\item Workflow + Klassen + Funktionen + Sequenz-Diagramm
-	
-	\item GUI
-	\begin{itemize}
-		\item Spannt eine GUI ebene auf mit der sich eine ebene zum Filtern der Vektor daten aktivieren und einstellen lässt
-		\item Triggert gewisse Events, bei Änderungen
-		\begin{itemize}
-			\item Wird genutzt um Filer an zu passen
-		\end{itemize}
-		\item Daten werden bei anfrage an Backend genutzt
-	\end{itemize}
-\end{itemize}
+Da die Frontend Applikation auf JavaScript Bibliotheken aufbaut,
+ist es Notwendig mit JavaScript Interoperabilität zu bewahren.
+Um das zu bewerkstelligen, wird eine Programmiersprache genutzt,
+welche auf JavaScript transpiled wird. TypeScript ist ein
+Superset von JavaScript, mit der Möglichkeit Typsicherheit bei
+Transpilezeit zu überprüfen. So können JavaScript Bibliotheken
+direkt von TypeScript genutzt werden, und durch Typ-Beschreibungen
+erweitert werden. Solche Typ-Header sind für viele Bibliotheken
+bereits verfügbar (vgl. DefinitelyTyped \cite{DefinitelyTyped}),
+wie es für \grqq Three.js\grqq\space auch der Fall ist. Für
+\grqq AR.js\grqq\space wird ein eigener Header mit Hilfe des
+Quellcodes angelegt (Code \ref{code:ARjsHeader}).
+
+\bigskip
+
+\lstinputlisting[
+	language=TypeScript,
+	caption={Beispielhafter Auszug aus dem TypeScript Header für \grqq AR.js\grqq },
+	label={code:ARjsHeader},
+	linerange={1-1, 9-25, 34-40, 256-256}
+]{../frontend/types/ar/index.d.ts}
+
+Um Bibliotheken des Frontends zu verwalten, wird \grqq Node
+Package Manager\grqq\space (npm) genutzt. Es ermöglicht
+Bibliotheken beim Bauen eines Projektes zu verwalten, was von
+TypeScript vorausgesetzt wird, um auf deren Header zuzugreifen.
+Es wird \grqq Three.js\grqq\space aus dem offiziellen Verzeichnis
+bezogen, und \grqq AR.js\grqq\space aus einem stabilen Branch des
+GitHub Repositorys (siehe Code \ref{code:PackageJSON}, Zeilen
+\ref{line:DependenciesStart} - \ref{line:DependenciesEnd}).
+
+\begin{codefloat}
+	\begin{lstlisting}[
+		language=TypeScript,
+		caption={Konfigurationsdatei \texttt{package.json} von npm},
+		label={code:PackageJSON},
+		escapechar=|
+	]
+{
+	"name": "ar_sensor_frontend",
+	"version": "1.0.0",
+	"scripts": { |\label{line:ScriptsStart}|
+		"build": "webpack",
+		"start": "webpack-dev-server"
+	}, |\label{line:ScriptsEnd}|
+	"dependencies": { |\label{line:DependenciesStart}|
+		"ar.js": "AR-js-org/AR.js#3.3.1",
+		"three": "^0.122.0"
+	}, |\label{line:DependenciesEnd}|
+	"devDependencies": { |\label{line:DevDependenciesStart}|
+		"@webpack-cli/init": "^0.3.0",
+		"copy-webpack-plugin": "^6.3.1",
+		"exports-loader": "^0.7.0",
+		"html-webpack-plugin": "^4.3.0",
+		"ts-loader": "^7.0.2",
+		"typescript": "^3.8.3",
+		"webpack": "^4.44.2",
+		"webpack-cli": "^3.3.11",
+		"webpack-dev-server": "^3.11.0"
+	} |\label{line:DevDependenciesEnd}|
+}
+	\end{lstlisting}
+\end{codefloat}
+
+Durch npm werden des weiteren Entwicklungswerkzeuge genutzt, die das
+Transpilen von TypeScript, Testen der Website, und Packen der Website
+vereinfachen (siehe Code \ref{code:PackageJSON}, Zeilen
+\ref{line:ScriptsStart} - \ref{line:ScriptsEnd} und
+\ref{line:DevDependenciesStart} - \ref{line:DevDependenciesEnd}).
+Eines dieser Werkzeuge ist \grqq webpack\grqq . Es erlaubt, für eine
+Website, den Quellcode zu einer Datei zu packen, um bei komplexer
+Abhängigkeitsstruktur die Quelldateien nicht einzeln zur
+ausgelieferten Website hinzufügen zu müssen.
+Bei \grqq webpack\grqq\space wird von einem einheitlichen Importierschema
+ausgegangen. Da \grqq AR.js\grqq\space kein Export-Schema nutzt, sondern
+seine Werte direkt in den globalen Scope schreibt, muss der Quellcode
+modifiziert werden, um zu spezifizieren, welche Werte exportiert werden
+sollen. Es wird die globale Variable \texttt{THREEx} als Standardexport
+festgelegt (Code \ref{code:WebpackTHREExExport}). Des weiteren werden
+auch Werte, die von \grqq AR.js\grqq\space erwartet werden, dem Code
+zur Verfügung gestellt. Dies beschränkt sich auf den Standardexport von
+\grqq Three.js\grqq\space (Code \ref{code:WebpackTHREEProvider}).
+
+\bigskip
+
+\lstinputlisting[
+	language=TypeScript,
+	caption={%
+		Definition der Variable \texttt{THREEx} als Standardexport
+		von \grqq AR.js\grqq , in \texttt{webpack.config.js}%
+	},
+	label={code:WebpackTHREExExport},
+	linerange={26-30},
+	firstnumber=26,
+]{../frontend/webpack.config.js}
+
+\bigskip
+
+\lstinputlisting[
+	language=TypeScript,
+	caption={%
+		Definition des Standardexports von \grqq Three.js\grqq\space
+		als globale Variable \texttt{THREE}, in \texttt{webpack.config.js}%
+	},
+	label={code:WebpackTHREEProvider},
+	linerange={46-48},
+	firstnumber=46,
+]{../frontend/webpack.config.js}
+
+Um das Frontend zu initialisieren, wird der Kommandozeilenbefehl
+\texttt{npm install} genutzt. Dieser überprüft die existierenden
+Module auf dem System, und installiert fehlende, in das
+Unterverzeichnis \verb|node_modules/|.
+Um das Projekt zu bauen, wird der Kommandozeilenbefehl
+\texttt{npm run-script build} genutzt, welcher in dem Unterverzeichnis
+\verb|out/| alle auszuliefernden Dateien erzeugt.
+
+Für die AR-Funktionalität wird ein Wrapper um \grqq AR.js\grqq\space
+entwickelt, welcher die Kamera einbindet, und darstellt, und den
+Virtuellen Marker anpasst. Er erwartet vor der Berechnung eines
+neuen Frames den Aufruf der \texttt{update} Methode, und bei
+Größenänderungen des Anzeigebereichs, den Aufruf der \texttt{updateSize}
+Methode. Er passt bei Initialisierung die Projektionsmatrix der
+virtuellen Kamera, an die der echten Kamera an. Gesuchte Marker
+können von dem Wrapper über die \texttt{createMarkerRoot} Methode
+angefragt werden.
+
+Code \ref{code:FrontendMain} zeigt die Arbeitsschritte bei der
+Initialisierung des Frontends. Es wird ein Wrapper zur Nutzeroberfläche
+instanziert, und dann werden Szene, Kamera und Renderer für die
+3D Visualisierung angelegt. Damit wird ein \texttt{ArWrapper}
+erstellt, der einen virtuellen Marker zur Verfügung stellt.
+Als Kind dieses Markers, wird eine Gruppe erstellt, die in Zeile
+\ref{line:MarkerOffset} transformiert wird, um relative Größe und
+Position des Markers zum logischen Weltursprung der Echtwelt auszubessern.
+In Zeile \ref{line:ArrowCloud} wird ein Pool an Pfeilen erstellt,
+welche unsichtbar sind, bis sie an Daten angepasst werden.
+In Zeilen \ref{line:KokilleStart} - \ref{line:KokilleEnd} wird
+asynchron das Referenzmodell geladen, und, relativ zum
+logischen Weltursprung der Echtwelt transformiert.
+
+\begin{codefloat}
+	\begin{lstlisting}[
+		language=TypeScript,
+		caption={Initialisierung des Frontends},
+		label={code:FrontendMain},
+		escapechar=@
+	]
+// Initialise GUI watchers
+const gui = new GUI()
 
 
+const scene = new Scene()
 
+const camera = new Camera()
+scene.add(camera)
+
+const renderer = createRenderer(gui.canvas)
+
+const ar = new ArWrapper(renderer, camera, Backend.cameraParameters)
+const markerRoot = ar.createMarkerRoot(scene, Backend.markerPattern)
+
+const root = createGroup(markerRoot)
+
+// Pool of arrows to reposition
+// (as to not have to recreate them every frame)
+const arrowCloud = createArrowCloud(root, 10000) @\label{line:ArrowCloud}@
+
+updatePositioning(root, Backend.markerPositioning) @\label{line:MarkerOffset}@
+
+loadModel(
+	Backend.kokilleModelPath,
+	'kokille.obj',
+	'kokille.mtl',
+	kokille => {  @\label{line:KokilleStart}@
+		root.add(kokille)
+		updatePositioning(kokille, Backend.kokilleTransformation)
+	}
+) @\label{line:KokilleEnd}@
+	\end{lstlisting}
+\end{codefloat}
+
+Code \ref{code:FrontendUpdate} zeigt die Arbeitsschritte um das Frontend
+zu Aktualisieren. Dies geschieht auf zwei Weisen. Einerseits werden
+jeden Frame lokale Berechnungen getätigt (Zeilen \ref{line:RunFunStart} -
+\ref{line:RunBlockEnd}), andererseits werden in einem Intervall von
+\texttt{500ms} neue Daten vom Backend angefragt (Zeilen
+\ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd}).
+Die \texttt{run} Funktion (Zeilen \ref{line:RunFunStart} -
+\ref{line:RunFunEnd}) erhält beim ausführen ein Callback, welches
+bei jeder Aktualisierung ausgeführt wird, um Daten anzupassen.
+Sie startet eine Kette an Animationsschritten, über die
+\texttt{requestAnimationFrame} Funktion. In diesen Animationsschritten
+wird der \texttt{ArWrapper} Aktualisiert, und das 3D-Bild neu gezeichnet.
+Das \texttt{updateCallback}, das der \texttt{run} Funktion übergeben
+wird (Zeilen \ref{line:RunBlockStart} - \ref{line:RunBlockEnd}),
+überprüft ob neue Pfeile vom Backend erhalten wurden, und überträgt,
+fallt nötig, die Daten auf die angezeigten Pfeile der zuvor
+erstellten \texttt{arrowCloud}.
+Zeilen \ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd} zeigen die
+Anfrage an das Backend, neue Daten zu senden. Dabei wird überprüft,
+ob ein Filter im Frontend eingestellt wurde, der die angezeigten
+Pfeile beschränkt. Ist dies der Fall, werden die Filterdaten der
+Anfrage beigelegt.
+
+\begin{codefloat}
+	\begin{lstlisting}[
+		language=TypeScript,
+		caption={Update des Frontends},
+		label={code:FrontendUpdate},
+		escapechar=@
+	]
+function run(updateCallback: () => void) { @\label{line:RunFunStart}@
+	function animate() {
+		requestAnimationFrame(animate)
+
+		updateCallback()
+
+		ar.update()
+
+		renderer.render(scene, camera)
+	}
+
+	animate()
+} @\label{line:RunFunEnd}@
+
+let lines: Array<Line3> = [] @\label{line:LinesVar}@
+let lastLines: Array<Line3> = lines @\label{line:LastLinesVar}@
+
+run(() => { @\label{line:RunBlockStart}@
+	if (lastLines !== lines) {
+		lastLines = lines
+
+		const currentLines = lines
+		const arrowCount = arrowCloud.length
+
+		for (let i = 0; i < arrowCount; i++) {
+			const arrow = arrowCloud[i]
+			const line = currentLines[i]
+
+			if (line) {
+				arrow.visible = true
+				arrow.setColor(arrowColors.getColor(getLineLength(line)))
+				moveArrowToLine(arrow, line)
+			} else {
+				arrow.visible = false
+			}
+		}
+	}
+}) @\label{line:RunBlockEnd}@
+
+setInterval(async () => { @\label{line:DataUpdateStart}@
+	if (gui.filterEnabled) {
+		const plain = gui.filterPlain
+
+		lines = await Backend.getVectorData(
+			plain.x, plain.y, plain.z,
+			plain.nVector.x, plain.nVector.y, plain.nVector.z
+		)
+	} else {
+		lines = await Backend.getAllVectorData();
+	}
+}, 500) @\label{line:DataUpdateEnd}@
+	\end{lstlisting}
+\end{codefloat}
+
+%\begin{itemize}
+%	\item Tools
+%	\begin{itemize}
+%	
+%		\item TypeScript
+%		\begin{itemize}
+%			\item Typ-Sichere version von JavaScript
+%			\item Compiliert auf JavaScript
+%		\end{itemize}
+%		
+%		\item npm
+%		\begin{itemize}
+%			\item Three.js als dependency
+%			\item AR.js von github
+%			\begin{itemize}
+%				\item TypeScript declaration file
+%			\end{itemize}
+%		\end{itemize}
+%		
+%		\item webpack
+%	\end{itemize}
+%	
+%	\item Workflow + Klassen + Funktionen + Sequenz-Diagramm
+%	
+%	\item GUI
+%	\begin{itemize}
+%		\item Spannt eine GUI ebene auf mit der sich eine ebene zum Filtern der Vektor daten aktivieren und einstellen lässt
+%		\item Triggert gewisse Events, bei Änderungen
+%		\begin{itemize}
+%			\item Wird genutzt um Filer an zu passen
+%		\end{itemize}
+%		\item Daten werden bei anfrage an Backend genutzt
+%	\end{itemize}
+%\end{itemize}
+
+
+\FloatBarrier
 \subsection{Implementierung des Backends}
 
 \begin{figure}[H]
