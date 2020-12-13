@@ -1,64 +1,90 @@
 \usepackage{listings}
 
-\floatstyle{plain}
-\newfloat{codefig}{H}{lop}
-\floatname{codefig}{Code}
+%\floatstyle{plain}
+%\newfloat{codefig}{H}{lop}
+%\floatname{codefig}{Code}
+%\def\lstfloatautorefname{Code}
+
+\renewcommand{\lstlistingname}{Code}
+\renewcommand{\lstlistlistingname}{Quellcodeausschnitte}
 
 % Define JavaScript as language for listings
-\lstdefinelanguage{JavaScript}{
+\lstdefinelanguage{TypeScript}{
+	basicstyle=\ttfamily\footnotesize,
 	keywords={
-		typeof,
-		new,
-		true,
-		false,
-		function,
-		null,
-		var,
-		let,
-		const,
-		in,
-		is,
-		async,
-		instanceof
+		typeof, new, true, false,
+		function, class, this, null,
+		var, let, const, in, is,
+		async, instanceof, private,
+		public, readonly, constructor
 	},
 	keywordstyle=\color{blue}\bfseries,
-	ndkeywords={
-		return,
-		if,
-		while,
-		do,
-		else,
-		catch,
-		switch,
-		case,
-		break,
-		class,
-		export,
-		boolean,
-		throw,
-		implements,
-		import,
-		this,
-		await
+	otherkeywords={% Operators
+		=>
 	},
-	ndkeywordstyle=\color{purple}\bfseries,
+	ndkeywords={
+		return, if, while, do, else, catch,
+		switch, case, break, export, boolean,
+		throw, implements, import, await
+	},
+	ndkeywordstyle=\color{violet}\bfseries,
 	identifierstyle=\color{black},
 	sensitive=false,
 	comment=[l]{//},
 	morecomment=[s]{/*}{*/},
-	commentstyle=\color{ForestGreen}\ttfamily,
-	stringstyle=\color{red}\ttfamily,
+	commentstyle=\color{ForestGreen},
+	stringstyle=\color{red},
+	morestring=[b]',
+	morestring=[b]",
+	morestring=[b]`
+}
+
+\lstdefinelanguage{CSharp}{
+	basicstyle=\ttfamily\footnotesize,
+	keywords={
+		abstract, event, new, struct, var,
+		as, explicit, null, switch,
+		base, extern, object, this,
+		bool, false, operator, throw,
+		break, finally, out, true,
+		byte, fixed, override, try,
+		case, float, params, typeof,
+		catch, for, private, uint,
+		char, foreach, protected, ulong,
+		checked, goto, public, unchecked,
+		class, if, readonly, unsafe,
+		const, implicit, ref, ushort,
+		continue, in, return, using,
+		decimal, int, sbyte, virtual,
+		default, interface, sealed, volatile,
+		delegate, internal, short, void,
+		do, is, sizeof, while,
+		double, lock, stackalloc,
+		else, long, static,
+		enum, namespace, string
+	},
+	keywordstyle=\color{blue}\bfseries,
+	otherkeywords={% Operators
+		=>
+	},
+	identifierstyle=\color{black}\bfseries,
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{ForestGreen},
+	stringstyle=\color{red},
 	morestring=[b]',
 	morestring=[b]",
 	morestring=[b]`
 }
 
 \lstset{
-	frame=lr,
-	rulecolor=\color{blue!80!black},
+	frame=tb,
+	captionpos=b,
+	%rulecolor=\color{blue!80!black},
+	inputencoding=utf8,
 	tabsize=2,
-    stepnumber=1,
-    breakatwhitespace=false,
+	numbersep=5pt,
     showstringspaces=false,
 	extendedchars=true,
 	numbers=left,
@@ -66,6 +92,19 @@
 }
 
 \lstdefinestyle{sharpc}{
-	language=[Sharp]C,
-    tabsize=1
+	language=CSharp,
+	escapechar=`
 }
+
+
+\newenvironment{codeblock}{%
+	\bigskip
+	%\begin{fullwidth}[width=\linewidth+4cm]
+		\noindent\begin{minipage}{\linewidth}%
+}
+			% Code
+{%
+		\end{minipage}
+	%\end{fullwidth}%
+}
+
