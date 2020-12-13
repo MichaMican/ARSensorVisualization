@@ -7,10 +7,11 @@
 \lstdefinelanguage{TypeScript}{
 	keywords={
 		typeof, new, true, false,
-		function, class, this, null,
+		function, class, this,
 		var, let, const, in, is,
 		async, instanceof, private,
-		public, readonly, constructor
+		public, readonly, constructor,
+		declare, module
 	},
 	keywordstyle=\color{blue}\bfseries,
 	otherkeywords={% Operators
@@ -18,8 +19,10 @@
 	},
 	ndkeywords={
 		return, if, while, do, else, catch,
-		switch, case, break, export, boolean,
-		throw, implements, import, await
+		switch, case, break, export,
+		throw, implements, import, await,
+		null, undefined, boolean, string,
+		any, void, number
 	},
 	ndkeywordstyle=\color{violet}\bfseries,
 	identifierstyle=\color{black},
@@ -121,12 +124,19 @@
 
 \newenvironment{codeblock}{%
 	\bigskip
-	%\begin{fullwidth}[width=\linewidth+4cm]
-		\noindent\begin{minipage}{\linewidth}%
+	\noindent\begin{minipage}{\linewidth}%
 }
-			% Code
+		% Code
 {%
-		\end{minipage}
-	%\end{fullwidth}%
+	\end{minipage}
+}
+
+
+\newenvironment{codefloat}{%
+	\begin{figure}
+}
+		% Code
+{%
+	\end{figure}
 }
 
