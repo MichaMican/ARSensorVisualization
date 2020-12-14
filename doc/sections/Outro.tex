@@ -1,20 +1,41 @@
 \section{Schlussfolgerung und Ausblick}
 
-\begin{itemize}
-	\item Vorgaben nicht umsetzbar ohne abstriche.
-	\item AR.js läuft besser auf handy als auf PC
-	\item Visualisierung is eig kake - Microsof MX wär doch viel geiler
-	\item Direkter Informationstransport zwischen kokille und backend muss umgesetzt werden (aktuell ja nur simulations daten)
-	\item HTTPS hosting in lokaler umgebung aufesetzbar
-	\begin{itemize} \renewcommand{\labelitemii}{$\Rightarrow$}
-		\item Gerät muss zertifikat vertrauen
-	\end{itemize}
-	
-	\item Andere implementierung des Backends
-	\begin{itemize}
-		\item Kann für Visualisierung in anderen Feldern helfen
-		\begin{itemize}
-			\item z. B. Luftströme bei Autos, etc.
-		\end{itemize}
-	\end{itemize}
-\end{itemize}
+Moderne Sicherheitskonzepte von Browsern sind nicht dazu ausgelegt,
+in lokalen Netzwerken, Webseiten barrierefrei zu ermöglichen.
+Daher ist es nicht möglich die Vorgaben, ohne Einschränkungen umzusetzen.
+Diese Probleme können teilweise durch lokale Zertifikate gelöst werden,
+was durch eine zukünftige Arbeit erzielt werden kann.
+
+Das Testen von OpenGL Anwendungen im Browser erscheint, als ob eine
+Ausführung auf einem Smartphone starke Performanzeinschnitte erleiden
+würde. Dieser Eindruck lässt sich bei der dargestellten Anwendung nicht
+bestätigen. Zukünftige Forschung in dieses Thema könnte Aufschlüsse geben.
+
+Weitere Arbeiten können Backends produzieren, welche Visualisierungen
+für andere Einsatzgebiete ermöglichen. Es kann zudem auch eine echte
+Datenquelle, anstatt Simulationsdaten eingebunden werden.
+
+Das Resultat der Arbeit zeigt einen guten Ansatz für die Arbeitsteilung
+und Kommunikation zwischen Frontend und Backend. Die Visualisierung selbst
+ist jedoch, auf einer 2-Dimensionalen Anzeigefläche, oft unklar.
+Hier ist eine Ausarbeitung in stereoskopischer AR ein potentieller
+Ansatz, dies zu lösen.
+
+%\begin{itemize}
+%	\item Vorgaben nicht umsetzbar ohne abstriche.
+%	\item AR.js läuft besser auf handy als auf PC
+%	\item Visualisierung is eig kake - Microsof MX wär doch viel geiler
+%	\item Direkter Informationstransport zwischen frontend und backend muss umgesetzt werden (aktuell ja nur simulations daten)
+%	\item HTTPS hosting in lokaler umgebung aufesetzbar
+%	\begin{itemize} \renewcommand{\labelitemii}{$\Rightarrow$}
+%		\item Gerät muss zertifikat vertrauen
+%	\end{itemize}
+%	
+%	\item Andere implementierung des Backends
+%	\begin{itemize}
+%		\item Kann für Visualisierung in anderen Feldern helfen
+%		\begin{itemize}
+%			\item z. B. Luftströme bei Autos, etc.
+%		\end{itemize}
+%	\end{itemize}
+%\end{itemize}
