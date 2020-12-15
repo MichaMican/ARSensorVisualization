@@ -1,0 +1,142 @@
+\usepackage{listings}
+
+\renewcommand{\lstlistingname}{Code}
+\renewcommand{\lstlistlistingname}{Quellcodeausschnitte}
+
+% Define TypeScript as language for listings
+\lstdefinelanguage{TypeScript}{
+	keywords={
+		typeof, new, true, false,
+		function, class, this,
+		var, let, const, in, is,
+		async, instanceof, private,
+		public, readonly, constructor,
+		declare, module
+	},
+	keywordstyle=\color{blue}\bfseries,
+	otherkeywords={% Operators
+		=>
+	},
+	ndkeywords={
+		return, if, while, do, else, catch,
+		switch, case, break, export,
+		throw, implements, import, await,
+		null, undefined, boolean, string,
+		any, void, number
+	},
+	ndkeywordstyle=\color{violet}\bfseries,
+	identifierstyle=\color{black},
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{ForestGreen},
+	stringstyle=\color{red},
+	morestring=[b]',
+	morestring=[b]",
+	morestring=[b]`
+}
+
+\lstdefinelanguage{CSharp}{
+	keywords={
+		abstract, event, new, struct, var,
+		as, explicit, null, switch,
+		base, extern, object, this,
+		bool, false, operator, throw,
+		break, finally, out, true,
+		byte, fixed, override, try,
+		case, float, params, typeof,
+		catch, for, private, uint,
+		char, foreach, protected, ulong,
+		checked, goto, public, unchecked,
+		class, if, readonly, unsafe,
+		const, implicit, ref, ushort,
+		continue, in, return, using,
+		decimal, int, sbyte, virtual,
+		default, interface, sealed, volatile,
+		delegate, internal, short, void,
+		do, is, sizeof, while,
+		double, lock, stackalloc,
+		else, long, static,
+		enum, namespace, string
+	},
+	keywordstyle=\color{blue}\bfseries,
+	otherkeywords={% Operators
+		=>
+	},
+	identifierstyle=\color{black}\bfseries,
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{ForestGreen},
+	stringstyle=\color{red},
+	morestring=[b]',
+	morestring=[b]",
+	morestring=[b]`
+}
+
+%define colors for json
+\colorlet{punct}{red!60!black}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+\lstdefinelanguage{json}{
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+\definecolor{background}{HTML}{EEEEEE}
+
+\lstset{
+	basicstyle=\ttfamily\footnotesize,
+	frame=lines,
+	captionpos=b,
+	%rulecolor=\color{blue!80!black},
+	inputencoding=utf8,
+	tabsize=2,
+	numbersep=5pt,
+    showstringspaces=false,
+	extendedchars=true,
+	numbers=left,
+	breaklines=true,
+	backgroundcolor=\color{background},
+}
+
+\lstdefinestyle{sharpc}{
+	language=CSharp,
+	escapechar=`
+}
+
+
+\newenvironment{codeblock}{%
+	\bigskip
+	\noindent\begin{minipage}{\linewidth}%
+}
+		% Code
+{%
+	\end{minipage}
+}
+
+
+\newenvironment{codefloat}{%
+	\begin{figure}
+}
+		% Code
+{%
+	\end{figure}
+}
+

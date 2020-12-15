@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Controllers.Engines;
+using backend.Interface;
+using backend.Models.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
@@ -26,11 +29,15 @@ namespace backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
             services.AddCors(o => o.AddPolicy("AllowAnyOrigin", builder => {
                 builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             }));
+
+            services.AddSingleton<IDefaultEngine, DefaultEngineV2>();
 
             services.AddControllers();
             services.AddDirectoryBrowser();
@@ -71,9 +78,6 @@ namespace backend
             app.UseDirectoryBrowser();
 
             app.UseRouting();
-
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

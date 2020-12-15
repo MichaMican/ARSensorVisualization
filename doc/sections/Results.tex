@@ -1,0 +1,674 @@
+\section{Ergebnisse}
+
+
+\subsection{Implementierung des Frontends}
+
+Da die Frontend Applikation auf JavaScript Bibliotheken aufbaut,
+ist es Notwendig mit JavaScript Interoperabilität zu bewahren.
+Um das zu bewerkstelligen, wird eine Programmiersprache genutzt,
+welche auf JavaScript transpiled wird. TypeScript ist ein
+Superset von JavaScript, mit der Möglichkeit Typsicherheit bei
+Transpilezeit zu überprüfen. So können JavaScript Bibliotheken
+direkt von TypeScript genutzt werden, und durch Typ-Beschreibungen
+erweitert werden. Solche Typ-Header sind für viele Bibliotheken
+bereits verfügbar (vgl. DefinitelyTyped \cite{DefinitelyTyped}),
+wie es für \grqq Three.js\grqq\space auch der Fall ist. Für
+\grqq AR.js\grqq\space wird ein eigener Header mit Hilfe des
+Quellcodes angelegt (Code \ref{code:ARjsHeader}).
+
+\bigskip
+
+\lstinputlisting[
+	language=TypeScript,
+	caption={Beispielhafter Auszug aus dem TypeScript Header für \grqq AR.js\grqq },
+	label={code:ARjsHeader},
+	linerange={1-1, 9-25, 34-40, 256-256}
+]{../frontend/types/ar/index.d.ts}
+
+Um Bibliotheken des Frontends zu verwalten, wird \grqq Node
+Package Manager\grqq\space (npm) genutzt. Es ermöglicht
+Bibliotheken beim Bauen eines Projektes zu verwalten, was von
+TypeScript vorausgesetzt wird, um auf deren Header zuzugreifen.
+Es wird \grqq Three.js\grqq\space aus dem offiziellen Verzeichnis
+bezogen, und \grqq AR.js\grqq\space aus einem stabilen Branch des
+GitHub Repositorys (siehe Code \ref{code:PackageJSON}, Zeilen
+\ref{line:DependenciesStart} - \ref{line:DependenciesEnd}).
+
+\begin{codefloat}
+	\begin{lstlisting}[
+		language=TypeScript,
+		caption={Konfigurationsdatei \texttt{package.json} von npm},
+		label={code:PackageJSON},
+		escapechar=|
+	]
+{
+	"name": "ar_sensor_frontend",
+	"version": "1.0.0",
+	"scripts": { |\label{line:ScriptsStart}|
+		"build": "webpack",
+		"start": "webpack-dev-server"
+	}, |\label{line:ScriptsEnd}|
+	"dependencies": { |\label{line:DependenciesStart}|
+		"ar.js": "AR-js-org/AR.js#3.3.1",
+		"three": "^0.122.0"
+	}, |\label{line:DependenciesEnd}|
+	"devDependencies": { |\label{line:DevDependenciesStart}|
+		"@webpack-cli/init": "^0.3.0",
+		"copy-webpack-plugin": "^6.3.1",
+		"exports-loader": "^0.7.0",
+		"html-webpack-plugin": "^4.3.0",
+		"ts-loader": "^7.0.2",
+		"typescript": "^3.8.3",
+		"webpack": "^4.44.2",
+		"webpack-cli": "^3.3.11",
+		"webpack-dev-server": "^3.11.0"
+	} |\label{line:DevDependenciesEnd}|
+}
+	\end{lstlisting}
+\end{codefloat}
+
+Durch npm werden des weiteren Entwicklungswerkzeuge genutzt, die das
+Transpilen von TypeScript, Testen der Website, und Packen der Website
+vereinfachen (siehe Code \ref{code:PackageJSON}, Zeilen
+\ref{line:ScriptsStart} - \ref{line:ScriptsEnd} und
+\ref{line:DevDependenciesStart} - \ref{line:DevDependenciesEnd}).
+Eines dieser Werkzeuge ist \grqq webpack\grqq . Es erlaubt, für eine
+Website, den Quellcode zu einer Datei zu packen, um bei komplexer
+Abhängigkeitsstruktur die Quelldateien nicht einzeln zur
+ausgelieferten Website hinzufügen zu müssen.
+Bei \grqq webpack\grqq\space wird von einem einheitlichen Importierschema
+ausgegangen. Da \grqq AR.js\grqq\space kein Export-Schema nutzt, sondern
+seine Werte direkt in den globalen Scope schreibt, muss der Quellcode
+modifiziert werden, um zu spezifizieren, welche Werte exportiert werden
+sollen. Es wird die globale Variable \texttt{THREEx} als Standardexport
+festgelegt (Code \ref{code:WebpackTHREExExport}). Des weiteren werden
+auch Werte, die von \grqq AR.js\grqq\space erwartet werden, dem Code
+zur Verfügung gestellt. Dies beschränkt sich auf den Standardexport von
+\grqq Three.js\grqq\space (Code \ref{code:WebpackTHREEProvider}).
+
+\bigskip
+
+\lstinputlisting[
+	language=TypeScript,
+	caption={%
+		Definition der Variable \texttt{THREEx} als Standardexport
+		von \grqq AR.js\grqq , in \texttt{webpack.config.js}%
+	},
+	label={code:WebpackTHREExExport},
+	linerange={26-30},
+	firstnumber=26,
+]{../frontend/webpack.config.js}
+
+\bigskip
+
+\lstinputlisting[
+	language=TypeScript,
+	caption={%
+		Definition des Standardexports von \grqq Three.js\grqq\space
+		als globale Variable \texttt{THREE}, in \texttt{webpack.config.js}%
+	},
+	label={code:WebpackTHREEProvider},
+	linerange={46-48},
+	firstnumber=46,
+]{../frontend/webpack.config.js}
+
+Um das Frontend zu initialisieren, wird der Kommandozeilenbefehl
+\texttt{npm install} genutzt. Dieser überprüft die existierenden
+Module auf dem System, und installiert fehlende, in das
+Unterverzeichnis \verb|node_modules/|.
+Um das Projekt zu bauen, wird der Kommandozeilenbefehl
+\texttt{npm run-script build} genutzt, welcher in dem Unterverzeichnis
+\verb|out/| alle auszuliefernden Dateien erzeugt.
+
+Für die AR-Funktionalität wird ein Wrapper um \grqq AR.js\grqq\space
+entwickelt, welcher die Kamera einbindet, und darstellt, und den
+Virtuellen Marker anpasst. Er erwartet vor der Berechnung eines
+neuen Frames den Aufruf der \texttt{update} Methode, und bei
+Größenänderungen des Anzeigebereichs, den Aufruf der \texttt{updateSize}
+Methode. Er passt bei Initialisierung die Projektionsmatrix der
+virtuellen Kamera, an die der echten Kamera an. Gesuchte Marker
+können von dem Wrapper über die \texttt{createMarkerRoot} Methode
+angefragt werden.
+
+Code \ref{code:FrontendMain} zeigt die Arbeitsschritte bei der
+Initialisierung des Frontends. Es wird ein Wrapper zur Nutzeroberfläche
+instanziert, und dann werden Szene, Kamera und Renderer für die
+3D Visualisierung angelegt. Damit wird ein \texttt{ArWrapper}
+erstellt, der einen virtuellen Marker zur Verfügung stellt.
+Als Kind dieses Markers, wird eine Gruppe erstellt, die in Zeile
+\ref{line:MarkerOffset} transformiert wird, um relative Größe und
+Position des Markers zum logischen Weltursprung der Echtwelt auszubessern.
+In Zeile \ref{line:ArrowCloud} wird ein Pool an Pfeilen erstellt,
+welche unsichtbar sind, bis sie an Daten angepasst werden.
+In Zeilen \ref{line:KokilleStart} - \ref{line:KokilleEnd} wird
+asynchron das Referenzmodell geladen, und, relativ zum
+logischen Weltursprung der Echtwelt transformiert.
+
+\begin{codefloat}
+	\begin{lstlisting}[
+		language=TypeScript,
+		caption={Initialisierung des Frontends},
+		label={code:FrontendMain},
+		escapechar=@
+	]
+// Initialise GUI watchers
+const gui = new GUI()
+
+
+const scene = new Scene()
+
+const camera = new Camera()
+scene.add(camera)
+
+const renderer = createRenderer(gui.canvas)
+
+const ar = new ArWrapper(renderer, camera, Backend.cameraParameters)
+const markerRoot = ar.createMarkerRoot(scene, Backend.markerPattern)
+
+const root = createGroup(markerRoot)
+
+// Pool of arrows to reposition
+// (as to not have to recreate them every frame)
+const arrowCloud = createArrowCloud(root, 10000) @\label{line:ArrowCloud}@
+
+updatePositioning(root, Backend.markerPositioning) @\label{line:MarkerOffset}@
+
+loadModel(
+	Backend.kokilleModelPath,
+	'kokille.obj',
+	'kokille.mtl',
+	kokille => {  @\label{line:KokilleStart}@
+		root.add(kokille)
+		updatePositioning(kokille, Backend.kokilleTransformation)
+	}
+) @\label{line:KokilleEnd}@
+	\end{lstlisting}
+\end{codefloat}
+
+Code \ref{code:FrontendUpdate} zeigt die Arbeitsschritte um das Frontend
+zu Aktualisieren. Dies geschieht auf zwei Weisen. Einerseits werden
+jeden Frame lokale Berechnungen getätigt (Zeilen \ref{line:RunFunStart} -
+\ref{line:RunBlockEnd}), andererseits werden in einem Intervall von
+\texttt{500ms} neue Daten vom Backend angefragt (Zeilen
+\ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd}).
+Die \texttt{run} Funktion (Zeilen \ref{line:RunFunStart} -
+\ref{line:RunFunEnd}) erhält beim ausführen ein Callback, welches
+bei jeder Aktualisierung ausgeführt wird, um Daten anzupassen.
+Sie startet eine Kette an Animationsschritten, über die
+\texttt{requestAnimationFrame} Funktion. In diesen Animationsschritten
+wird der \texttt{ArWrapper} Aktualisiert, und das 3D-Bild neu gezeichnet.
+Das \texttt{updateCallback}, das der \texttt{run} Funktion übergeben
+wird (Zeilen \ref{line:RunBlockStart} - \ref{line:RunBlockEnd}),
+überprüft ob neue Pfeile vom Backend erhalten wurden, und überträgt,
+fallt nötig, die Daten auf die angezeigten Pfeile der zuvor
+erstellten \texttt{arrowCloud}.
+Zeilen \ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd} zeigen die
+Anfrage an das Backend, neue Daten zu senden. Dabei wird überprüft,
+ob ein Filter im Frontend eingestellt wurde, der die angezeigten
+Pfeile beschränkt. Ist dies der Fall, werden die Filterdaten der
+Anfrage beigelegt.
+
+\begin{codefloat}
+	\begin{lstlisting}[
+		language=TypeScript,
+		caption={Update des Frontends},
+		label={code:FrontendUpdate},
+		escapechar=@
+	]
+function run(updateCallback: () => void) { @\label{line:RunFunStart}@
+	function animate() {
+		requestAnimationFrame(animate)
+
+		updateCallback()
+
+		ar.update()
+
+		renderer.render(scene, camera)
+	}
+
+	animate()
+} @\label{line:RunFunEnd}@
+
+let lines: Array<Line3> = [] @\label{line:LinesVar}@
+let lastLines: Array<Line3> = lines @\label{line:LastLinesVar}@
+
+run(() => { @\label{line:RunBlockStart}@
+	if (lastLines !== lines) {
+		lastLines = lines
+
+		const currentLines = lines
+		const arrowCount = arrowCloud.length
+
+		for (let i = 0; i < arrowCount; i++) {
+			const arrow = arrowCloud[i]
+			const line = currentLines[i]
+
+			if (line) {
+				arrow.visible = true
+				arrow.setColor(arrowColors.getColor(getLineLength(line)))
+				moveArrowToLine(arrow, line)
+			} else {
+				arrow.visible = false
+			}
+		}
+	}
+}) @\label{line:RunBlockEnd}@
+
+setInterval(async () => { @\label{line:DataUpdateStart}@
+	if (gui.filterEnabled) {
+		const plain = gui.filterPlain
+
+		lines = await Backend.getVectorData(
+			plain.x, plain.y, plain.z,
+			plain.nVector.x, plain.nVector.y, plain.nVector.z
+		)
+	} else {
+		lines = await Backend.getAllVectorData();
+	}
+}, 500) @\label{line:DataUpdateEnd}@
+	\end{lstlisting}
+\end{codefloat}
+
+%\begin{itemize}
+%	\item Tools
+%	\begin{itemize}
+%	
+%		\item TypeScript
+%		\begin{itemize}
+%			\item Typ-Sichere version von JavaScript
+%			\item Compiliert auf JavaScript
+%		\end{itemize}
+%		
+%		\item npm
+%		\begin{itemize}
+%			\item Three.js als dependency
+%			\item AR.js von github
+%			\begin{itemize}
+%				\item TypeScript declaration file
+%			\end{itemize}
+%		\end{itemize}
+%		
+%		\item webpack
+%	\end{itemize}
+%	
+%	\item Workflow + Klassen + Funktionen + Sequenz-Diagramm
+%	
+%	\item GUI
+%	\begin{itemize}
+%		\item Spannt eine GUI ebene auf mit der sich eine ebene zum Filtern der Vektor daten aktivieren und einstellen lässt
+%		\item Triggert gewisse Events, bei Änderungen
+%		\begin{itemize}
+%			\item Wird genutzt um Filer an zu passen
+%		\end{itemize}
+%		\item Daten werden bei anfrage an Backend genutzt
+%	\end{itemize}
+%\end{itemize}
+
+
+\FloatBarrier
+\subsection{Implementierung des Backends}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{images/backend/classDiagram}
+	\caption{System Klassen, Dto Klassen und Controller und Engine Klassen}
+	\label{fig:ClassDiagram}
+\end{figure}
+
+Die Backend API wird in Asp.NetCore (C\#) implementiert.
+Das Framework wurde gewählt, da es kostenlos und opensource
+ist und da es sowohl auf Linux als auch auf Windows lauffähig ist
+(vgl. DotNet Download page \cite{DotNetDownloadPage}).
+Außerdem liefert NetCore mit ASP nativ eine IIS Webapplikation
+Funktionalität mit, sodass die API schnell und einfach umzusetzen ist,
+ohne einen großen web hosting Overhead zu erzeugen. Grundsätzlich
+besteht das Programm aus drei Klassen Gruppen, den System Klassen,
+den Controller und Engine Klassen und den Daten Transfer Objekt (Dto)
+Klassen (siehe Abbildung \ref{fig:ClassDiagram}).
+
+Die Klasse Programm besitzt vordefinierten code zur Instanziierung
+des WebHosts. Um Die Host Ip selbst festlegen zu können wurde dieser
+Code um die ServerSettings erweitert, welche die HostIp aus der
+apsettings.json bezieht
+(Code \ref{code:Program.cs}:\ref{line:SettingsBind}) und im
+CreateHostBuilder diese als HostURL verwendet
+(Code \ref{code:Program.cs}:\ref{line:HostURL}).
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Methoden der Program Klasse},
+		label={code:Program.cs}
+	]
+public static void Main(string[] args)
+{
+	var config = new ConfigurationBuilder()
+		.AddJsonFile("appsettings.json", optional: false)
+		.Build();
+	var serSet = new ServerSettings();
+	config.GetSection("ServerSettings").Bind(serSet); `\label{line:SettingsBind}`
+	CreateHostBuilder(args, serSet).Build().Run();
+}
+
+public static IHostBuilder CreateHostBuilder(string[] args, ServerSettings serverSettings) =>
+	Host.CreateDefaultBuilder(args)
+		.ConfigureWebHostDefaults(webBuilder =>
+		{
+			webBuilder.UseStartup<Startup>();
+			webBuilder.UseUrls(serverSettings.HostIp); `\label{line:HostURL}`
+		});
+	\end{lstlisting}
+\end{codeblock}
+
+In der zweiten Systemklassen \grqq Startup.cs\grqq\space werden die
+Webhost und Umgebungseinstellungen getätigt.
+In Code \ref{code:ConfigureServices} Zeile \ref{line:ApplyConfig}
+wird der Teil \grqq AppSettings\grqq\space aus der
+\grqq appsettings.json\grqq\space ausgelesen und in die Dto Klasse
+\grqq AppSettings\grqq\space geparsed. Diese Instanz wird dann
+mithilfe von Dependency injection an alle Instanzen verteilt,
+welche das Objekt benötigen. In den Zeilen \ref{line:CorsPolicyStart}
+- \ref{line:CorsPolicyEnd} wird für später die CORS Policy definiert.
+Die hier definierte Policy wird jede Origin, mit jeder HTTP Methode
+und jedem Header akzeptieren. Außerdem wird in Zeile
+\ref{line:DefaultEngineV2Singleton} eine Instanz von DefaultEngineV2
+als Singleton für IDefaultEngine via Dependancy Injection definiert.
+Dependency Injection wird verwendet um ein einfaches austauschen der
+Engine zu ermöglichen und zur Vereinfachung des Lifetimemanagement
+der DefaultEngineV2 Instanz im DefaultController.
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Methode ConfigureServices in Startup.cs},
+		label={code:ConfigureServices}
+	]
+public void ConfigureServices(IServiceCollection services)
+{
+	services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));	`\label{line:ApplyConfig}`
+	services.AddCors(o => o.AddPolicy("AllowAnyOrigin", builder => { `\label{line:CorsPolicyStart}`
+		builder.AllowAnyOrigin()
+			.AllowAnyMethod()
+			.AllowAnyHeader();
+	})); `\label{line:CorsPolicyEnd}`
+	services.AddSingleton<IDefaultEngine, DefaultEngineV2>(); `\label{line:DefaultEngineV2Singleton}`
+	services.AddControllers();
+	services.AddDirectoryBrowser();
+}
+	\end{lstlisting}
+\end{codeblock}
+
+Diese Methode wird zu Laufzeit vor Configure
+(Code \ref{code:Configure}) aufgerufen. In Configure werden nun
+einige wichtige Einstellungen getätigt. In Code \ref{code:Configure}
+Zeile \ref{line:UseCors} wird die vorher in ConfigureServices definierte
+\grqq AllowAnyOrigin\grqq -Policy für die ganze WebApp übernommen.
+In den Zeilen \ref{line:StaticFilesStart} - \ref{line:StaticFilesEnd}
+wird eingestellt welche statischen Dateien gehostet werden sollen,
+wo diese liegen und wo diese aufzufinden sein sollen. So wird nun
+der gesamte Inhalt des Ordners wwwroot am /data Endpunkt zur
+Verfügung gestellt. Der zuvor erstellte FileExtensionContentTypeProvider
+(Code \ref{code:Configure}:
+\ref{line:FileExtensionContentTypeProviderStart} -
+\ref{line:FileExtensionContentTypeProviderEnd})
+definiert mit welchem Content-Type Header die "unbekannten"
+Datentypen übermittelt werden sollen. Wenn keine eindeutige
+Definition vorliegt wird die Datei mit dem Standard Header
+"text/html" nur dann ausgeliefert wenn ServeUnknowFileTypes auf
+true gesetzt wurde.
+Asp.NetCore liefert von sich einen Directory Browser mit,
+welcher eine graphische UI zur Navigation durch die statischen
+Dateien generiert (siehe Abbildung \ref{fig:DirectoryBrowser}).
+Dieser wird in Zeile \ref{line:UseDirectoryBrowser} aktiviert.
+Die letzten Zeilen sind von Asp.NetCore für API Anwendungen
+standardmäßig generierte Codezeilen. Sie aktivieren das Standard
+Routing und definieren die Controller als verarbeitende Endpunkte.
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Methode Configure in Startup.cs},
+		label={code:Configure}
+	]
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+	app.UseCors("AllowAnyOrigin"); `\label{line:UseCors}`
+
+	var provider = new FileExtensionContentTypeProvider(); `\label{line:FileExtensionContentTypeProviderStart}`
+	provider.Mappings[".dat"] = "application/octet-stream";
+	provider.Mappings[".patt"] = "text/html";
+	provider.Mappings[".mtl"] = "text/html";
+	provider.Mappings[".obj"] = "text/html"; `\label{line:FileExtensionContentTypeProviderEnd}`
+
+	app.UseStaticFiles(new StaticFileOptions `\label{line:StaticFilesStart}`
+	{
+		ServeUnknownFileTypes=true,
+		FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, "data")),
+		RequestPath = "/data",
+		ContentTypeProvider = provider
+	}); `\label{line:StaticFilesEnd}`
+	app.UseDirectoryBrowser(); `\label{line:UseDirectoryBrowser}`
+	app.UseRouting();
+	app.UseEndpoints(endpoints =>
+	{
+		endpoints.MapControllers();
+	});
+}
+	\end{lstlisting}
+\end{codeblock}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/backend/DirectoryBrowser}
+	\caption{Directory Browser zur Navigation durch statische Dateien des Servers}
+	\label{fig:DirectoryBrowser}
+\end{figure}
+
+Bei der ersten anfrage an die API wird eine Instanz des implementierten
+Controllers erstellt, welche nun die einkommenden Anfragen verarbeitet.
+Der DefaultControler bekommt bei Instanziierung via Dependency Injection
+die vorher in ConfigureServices definierte Instanz einer IDefaultEngine
+Interface implementierenden Klasse
+(vgl. Code \ref{code:DefaultControllerConstructor}).
+Diese Aufteilung in Controller und Engine wurde definiert um eine besser
+Codeübersicht zu gewährleisten. So ist die input verarbeitende Controller
+Klasse von der Datenverarbeitenden Engine Klasse losgelöst.
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Konstruktor der DefaultController Klasse},
+		label={code:DefaultControllerConstructor}
+	]
+private IDefaultEngine _engine;
+
+public DefaultController(IDefaultEngine engine)
+{
+	_engine = engine;
+}
+	\end{lstlisting}
+\end{codeblock}
+
+Die Controller Klasse implementiert die in Kapitel \ref{section:Backend}
+Definierten Endpunkte. GetVectorMetaData bezieht die Metadaten mit einem
+Methoden Aufruf aus der Engine Klasse und gibt diese dann zurück.
+Die GetVectorCollection Methode akzeptiert 8 optionale Parameter
+(siehe Tabelle \ref{tab:EndpointQueryParameters}). Aufgrund von API
+design best practices (vgl. Narumoto \cite{ApiDesignBestPractices})
+und aufgrund von potentiell hoher Datenmenge unterstützt der Endpunkt
+pagination. Durch setzen von limit und offset kann so gesteuert werden
+wieviele und welche Teile der Vektor Daten zurückgegeben werden.
+Durch angeben von n1, n2, n3, x, y, und z können die Ergebnisse
+zusätzlich gefiltert werden. Dies geschieht in der Engine Klasse.
+
+\begin{table}
+	\centering
+	\begin{tabular}[h]{p{0.11\linewidth} | p{0.7\linewidth}| p{0.09\linewidth}}
+	Parameter & Beschreibung & Default \\
+	\hline
+	limit & Limitiert die Anzahl an zurückgegebenen Vectoren & 100\\
+	offset & Definiert den Abstand vom ersten zurückgegebenen Vektor zum ersten Vektor im Datensatz & 0\\
+	n1 & x-Koordinate des Normalenvektors der Filter-Ebene & null\\
+	n2 & y-Koordinate des Normalenvektors der Filter-Ebene & null\\
+	n3 & z-Koordinate des Normalenvektors der Filter-Ebene & null\\
+	x & x-Koordinate eines punktes auf der Filter-Ebene & null\\
+	y & y-Koordinate eines punktes auf der Filter-Ebene & null\\
+	z & z-Koordinate eines punktes auf der Filter-Ebene & null\\
+	maxDist & Definiert den maximalen Abstand, den ein Punkt von der Filter-Ebene haben darf um zurückgegeben zu werden & 0.5\\
+	\end{tabular}
+	\caption{Query Parameter des api/data/ Endpunktes}
+	\label{tab:EndpointQueryParameters}
+\end{table}
+
+Die DefaultEngine Klasse Implementiert, das IDefaultEngine Interface
+und mit Ihr auch die Methoden GetAllVectors, GetVectorMetaData,
+und FilterVectors. Sie bezieht die AppSettings des Programms via
+Dependency Injection (vgl. Code \ref{code:DefaultEngineConstructor}).
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Konstruktor der DefaultEngine Klasse},
+		label={code:DefaultEngineConstructor}
+	]
+private AppSettings _settings;
+
+public DefaultEngineV2(IOptions<AppSettings> settings)
+{
+	_settings = settings.Value;
+}
+	\end{lstlisting}
+\end{codeblock}
+
+Dieses Settings Objekt ist erforderlich, da es den Pfad zu der Datei
+beinhaltet, welche die Vektordaten enthält. Diese Datei muss eine JSON
+Datei sein, welche aus einem Array mit Vektorobjekten besteht.
+Der Aufbau ist hier der Selbe, wie die JSON Antworten des Backends
+(siehe Code \ref{code:VecJSON}). Dieser Pfad wird von der Methode
+\grqq GetAllVectors\grqq\space an die private Methode
+\grqq LoadVectorsFromJsonFile\grqq\space weitergegeben, welche wiederum
+mithilfe des \grqq StreamReaders\grqq\space zunächst die Datei einliest
+und ansachließend mit \grqq JsonConvert\grqq\space in eine Liste an
+VectorDto Objekten paarst. (vgl. Code \ref{code:GetAllVectors})
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Akquirieren der Vektordaten von einer in den App-Settings definierten Datei},
+		label={code:GetAllVectors}
+	]
+private List<VectorDto> LoadVectorsFromJsonFile(string path)
+{
+	var returnList = new List<VectorDto>();
+
+	using (StreamReader r = new StreamReader(path))
+	{
+		string json = r.ReadToEnd();
+		returnList = JsonConvert.DeserializeObject<List<VectorDto>>(json);
+	}
+
+		return returnList;
+	}
+
+public List<VectorDto> GetAllVectors()
+{
+	return LoadVectorsFromJsonFile(_settings.jsonPath);
+}
+	\end{lstlisting}
+\end{codeblock}
+
+Diese Funktionen werden auch von \grqq GetVectorMetaData\grqq\space
+aufgerufen, welche dann jeweils die x,y und z Minima und Maxima und
+die Anzahl an Vektoren ermittelt ermittelt. Diese werden dann als
+\grqq VectorDataMetaData\grqq\space zurückgegeben.
+
+Die Engine Klasse stellt auch eine FilterVectors Methode zur Verfügung.
+Die Methode nimmt einen ein plainVectorDto Objekt, die maximale Distanz
+und die zu filternden Vektoren entgegen. Um die Distanz von einem Punkt
+zu einer Ebene zu ermitteln muss zunächst die Ebene in Koordinatenform
+($n1 \cdot x + n2 \cdot y + n3 \cdot z = c$) angegeben werden können.
+Hierfür muss nur noch c ermittelt werden, was durch einsetzen der Werte
+errechnet werden kann. Anschließend wird für jeden Punkt die Distanz
+mit der Formel $d = \frac{n1 \cdot x + n2 \cdot y + n3 \cdot z - c}{\sqrt{n1^2 + n2^2 + n3^2}}$.
+Diese Distanz wird mit der maximalen Distanz verglichen und der Vektor
+wird nur dann zurückgegeben, wenn diese kleiner oder gleich ist
+(vgl. Code \ref{code:FilterVectors}).
+
+\begin{codeblock}
+	\begin{lstlisting}[
+		style=sharpc,
+		caption={Filtern der Vektoren anhand der Distanz von einer Filterebene},
+		label={code:FilterVectors}
+	]
+private double GetDistanceVectorBasePlain(double n1, double n2, double n3, double c, VectorDto vector)
+{
+	return Math.Abs(n1 * vector.x + n2 * vector.y + n3 * vector.z - c) / Math.Sqrt(Math.Pow(n1, 2) + Math.Pow(n2, 2) + Math.Pow(n3, 2));
+}
+
+public List<VectorDto> FilterVectors(List<VectorDto> vectors, VectorDto plainVector, double maxDist)
+{
+	double n1 = plainVector.xVec;
+	double n2 = plainVector.yVec;
+	double n3 = plainVector.zVec;
+
+	double px = plainVector.x;
+	double py = plainVector.y;
+	double pz = plainVector.z;
+
+	double c = n1 * px + n2 * py + n3 * pz;
+
+	return vectors.Where((v) => GetDistanceVectorBasePlain(n1, n2, n3, c, v) <= maxDist).ToList();
+}
+	\end{lstlisting}
+\end{codeblock}
+
+Während der Entwicklung, waren zunächst keine Daten verfügbar.
+Daher wurden die Vektordaten ursprünglich durch ein Gravitation Modell
+simuliert. Auf diese Simulation wird in der Arbeit nicht weiter
+eingegangen.
+
+Das Backend wurde mit der Vektordaten Simulierung zu Testzwecken während
+der Entwicklung in einem Azure Webservice gehostet.
+
+%\begin{itemize}
+%	\item Framework: Netcore (C\#)
+%	\begin{itemize}
+%		\item Ausgewählt da
+%		\item NetCore sowohl auf Linux alsauch Windows verfügbar
+%		\item ASP Netcore eine stabile und aktuelle grundlage für WebApplications und WebAPIs bietet (liefert viele funktionen nativ mit)
+%	\end{itemize}
+%	
+%	\item Klassendiagramm
+%	\begin{itemize}
+%		\item Einzelne Klassen beschreiben
+%	\end{itemize}
+%		
+%	\item CORS
+%	\begin{itemize}
+%		\item Implementierung:
+%		\begin{itemize}
+%			\item Hinzufügen einer Policy in Netcore, welche alle Origins erlaubt
+%		\end{itemize}
+%	\end{itemize}
+%	
+%	\item Implementierung der Endpunkte
+%	\begin{itemize}
+%		\item Daten auslieferung/gewinnung
+%		\begin{itemize}
+%			\item Simulation der daten früher via Gravitationsmodell
+%			\item Simulation jetzt durch ausliefern vorberechneter und vorgegebener Simulationsdaten
+%		\end{itemize}
+%				
+%		\item Filterung
+%		\item Meta Info auslieferung
+%	\end{itemize}
+%		
+%	\item Ausliefern der statischen daten und aufbereitung mit DirecotryBrowser durch NetCore mitgelieferten funktionen
+%	\begin{itemize}	
+%		\item Hinzufügen eines FileExtensionContentTypeProvider für nicht nativ unterstützte Dateien (.dat, .patt, .mtl, .obj)
+%	\end{itemize}
+%		
+%	\item Hosten in Azure zu entwicklungszwecken
+%\end{itemize}
+
+

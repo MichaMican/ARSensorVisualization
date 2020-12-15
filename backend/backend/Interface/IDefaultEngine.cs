@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace backend.Interface
 {
-    interface IDefaultEngine
+    public interface IDefaultEngine
     {
-        List<VectorDto> GenerateVectors(int vectorCount);
+        VectorDataMetaData GetVectorMetaData();
+        List<VectorDto> GetAllVectors();
         List<VectorDto> FilterVectors(List<VectorDto> vectors, VectorDto plainVector, double maxDist);
     }
 }

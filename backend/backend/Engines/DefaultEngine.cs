@@ -10,6 +10,7 @@ namespace backend.Controllers.Engines
     public class DefaultEngine : IDefaultEngine
     {
         private List<GravitationPointDto> gravitationPoints = new List<GravitationPointDto>();
+        private int VECTOR_COUNT = 3000;
 
         public DefaultEngine()
         {
@@ -78,11 +79,11 @@ namespace backend.Controllers.Engines
 
         }
 
-        public List<VectorDto> GenerateVectors(int vectorCount)
+        public List<VectorDto> GetAllVectors()
         {
             var returnList = new List<VectorDto>();
 
-            for (int i = 0; i < vectorCount; i++)
+            for (int i = 0; i < VECTOR_COUNT; i++)
             {
                 double x = ((i % 10) - 5f) / 2;
                 double y = (Math.Floor(i / 200f));
