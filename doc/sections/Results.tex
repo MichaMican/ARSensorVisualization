@@ -1,4 +1,4 @@
-\section{Ergebnisse}
+\section{Implementation}
 
 
 \subsection{Implementierung des Frontends}
@@ -311,27 +311,27 @@ setInterval(async () => { @\label{line:DataUpdateStart}@
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{images/backend/classDiagram}
-	\caption{System Klassen, Dto Klassen und Controller und Engine Klassen}
+	\caption{System-, Dto-, Controller- und Engine-Klassen}
 	\label{fig:ClassDiagram}
 \end{figure}
 
-Die Backend API wird in Asp.NetCore (C\#) implementiert.
+Die Backend API ist in Asp.NetCore (C\#) implementiert.
 Das Framework wurde gewählt, da es kostenlos und opensource
 ist und da es sowohl auf Linux als auch auf Windows lauffähig ist
 (vgl. DotNet Download page \cite{DotNetDownloadPage}).
 Außerdem liefert NetCore mit ASP nativ eine IIS Webapplikation
 Funktionalität mit, sodass die API schnell und einfach umzusetzen ist,
 ohne einen großen web hosting Overhead zu erzeugen. Grundsätzlich
-besteht das Programm aus drei Klassen Gruppen, den System Klassen,
-den Controller und Engine Klassen und den Daten Transfer Objekt (Dto)
-Klassen (siehe Abbildung \ref{fig:ClassDiagram}).
+besteht das Programm aus drei Klassen Gruppen, den System-Klassen,
+den Controller-Klassen, den Engine-Klassen und den Data-transfer-object
+Klassen (Dto-Klassen) (siehe Abbildung \ref{fig:ClassDiagram}).
 
-Die Klasse Programm besitzt vordefinierten code zur Instanziierung
-des WebHosts. Um Die Host Ip selbst festlegen zu können wurde dieser
-Code um die ServerSettings erweitert, welche die HostIp aus der
-apsettings.json bezieht
+Die Klasse \texttt{Programm} besitzt von ASP.NET vorgenerierten Code zur Instanziierung
+des WebHosts. Um Die Host-IP selbst festlegen zu können wurde dieser
+Code um die \texttt{ServerSettings} erweitert, welche die Variable \texttt{HostIp} aus der
+\texttt{apsettings.json} Datei bezieht
 (Code \ref{code:Program.cs}:\ref{line:SettingsBind}) und im
-CreateHostBuilder diese als HostURL verwendet
+\texttt{CreateHostBuilder} diese als Host-URL verwendet
 (Code \ref{code:Program.cs}:\ref{line:HostURL}).
 
 \begin{codeblock}
@@ -360,22 +360,22 @@ public static IHostBuilder CreateHostBuilder(string[] args, ServerSettings serve
 	\end{lstlisting}
 \end{codeblock}
 
-In der zweiten Systemklassen \grqq Startup.cs\grqq\space werden die
+In der zweiten Systemklassen \texttt{Startup.cs} werden die
 Webhost und Umgebungseinstellungen getätigt.
 In Code \ref{code:ConfigureServices} Zeile \ref{line:ApplyConfig}
-wird der Teil \grqq AppSettings\grqq\space aus der
-\grqq appsettings.json\grqq\space ausgelesen und in die Dto Klasse
-\grqq AppSettings\grqq\space geparsed. Diese Instanz wird dann
+wird der Teil \texttt{AppSettings} aus der
+\texttt{appsettings.json} ausgelesen und in die Dto Klasse
+\texttt{AppSettings} geparsed. Diese Instanz wird dann später
 mithilfe von Dependency injection an alle Instanzen verteilt,
 welche das Objekt benötigen. In den Zeilen \ref{line:CorsPolicyStart}
 - \ref{line:CorsPolicyEnd} wird für später die CORS Policy definiert.
 Die hier definierte Policy wird jede Origin, mit jeder HTTP Methode
 und jedem Header akzeptieren. Außerdem wird in Zeile
-\ref{line:DefaultEngineV2Singleton} eine Instanz von DefaultEngineV2
+\ref{line:DefaultEngineV2Singleton} eine Instanz von \texttt{DefaultEngineV2}
 als Singleton für IDefaultEngine via Dependancy Injection definiert.
-Dependency Injection wird verwendet um ein einfaches austauschen der
-Engine zu ermöglichen und zur Vereinfachung des Lifetimemanagement
-der DefaultEngineV2 Instanz im DefaultController.
+Dependency Injection wird verwendet, um ein einfaches Austauschen der
+Engine zu ermöglichen und zur Vereinfachung des Lifetimemanagements
+der DefaultEngineV2-Instanz im DefaultController.
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -398,23 +398,23 @@ public void ConfigureServices(IServiceCollection services)
 	\end{lstlisting}
 \end{codeblock}
 
-Diese Methode wird zu Laufzeit vor Configure
-(Code \ref{code:Configure}) aufgerufen. In Configure werden nun
+Diese Methode wird zu Laufzeit vor \texttt{Configure}
+(Code \ref{code:Configure}) aufgerufen. In \texttt{Configure} werden nun
 einige wichtige Einstellungen getätigt. In Code \ref{code:Configure}
-Zeile \ref{line:UseCors} wird die vorher in ConfigureServices definierte
+Zeile \ref{line:UseCors} wird die vorher in \texttt{ConfigureServices} definierte
 \grqq AllowAnyOrigin\grqq -Policy für die ganze WebApp übernommen.
 In den Zeilen \ref{line:StaticFilesStart} - \ref{line:StaticFilesEnd}
 wird eingestellt welche statischen Dateien gehostet werden sollen,
 wo diese liegen und wo diese aufzufinden sein sollen. So wird nun
-der gesamte Inhalt des Ordners wwwroot am /data Endpunkt zur
-Verfügung gestellt. Der zuvor erstellte FileExtensionContentTypeProvider
+der gesamte Inhalt des Ordners \texttt{wwwroot} am \texttt{/data} Endpunkt zur
+Verfügung gestellt. Der zuvor erstellte \texttt{FileExtensionContentTypeProvider}
 (Code \ref{code:Configure}:
 \ref{line:FileExtensionContentTypeProviderStart} -
 \ref{line:FileExtensionContentTypeProviderEnd})
-definiert mit welchem Content-Type Header die "unbekannten"
+definiert mit welchem Content-Type Header die \grqq unbekannten\grqq\space
 Datentypen übermittelt werden sollen. Wenn keine eindeutige
 Definition vorliegt wird die Datei mit dem Standard Header
-"text/html" nur dann ausgeliefert wenn ServeUnknowFileTypes auf
+\grqq text/html\grqq\space nur dann ausgeliefert wenn \texttt{ServeUnknowFileTypes} auf
 true gesetzt wurde.
 Asp.NetCore liefert von sich einen Directory Browser mit,
 welcher eine graphische UI zur Navigation durch die statischen
@@ -466,13 +466,13 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
 Bei der ersten anfrage an die API wird eine Instanz des implementierten
 Controllers erstellt, welche nun die einkommenden Anfragen verarbeitet.
-Der DefaultControler bekommt bei Instanziierung via Dependency Injection
-die vorher in ConfigureServices definierte Instanz einer IDefaultEngine
+Der \texttt{DefaultControler} bekommt bei Instanziierung via Dependency Injection
+die vorher in \texttt{ConfigureServices} definierte Instanz einer \texttt{IDefaultEngine}
 Interface implementierenden Klasse
 (vgl. Code \ref{code:DefaultControllerConstructor}).
 Diese Aufteilung in Controller und Engine wurde definiert um eine besser
 Codeübersicht zu gewährleisten. So ist die input verarbeitende Controller
-Klasse von der Datenverarbeitenden Engine Klasse losgelöst.
+Klasse von der Datenverarbeitenden Engine Klasse losgelöst, ähnlich dem MVC-Modell.
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -490,11 +490,11 @@ public DefaultController(IDefaultEngine engine)
 \end{codeblock}
 
 Die Controller Klasse implementiert die in Kapitel \ref{section:Backend}
-Definierten Endpunkte. GetVectorMetaData bezieht die Metadaten mit einem
+definierten per HTTP erreichbaren Endpunkte. \texttt{GetVectorMetaData} bezieht die Metadaten mit einem
 Methoden Aufruf aus der Engine Klasse und gibt diese dann zurück.
-Die GetVectorCollection Methode akzeptiert 8 optionale Parameter
+Die \texttt{GetVectorCollection()} Methode akzeptiert 8 optionale Parameter
 (siehe Tabelle \ref{tab:EndpointQueryParameters}). Aufgrund von API
-design best practices (vgl. Narumoto \cite{ApiDesignBestPractices})
+Design best practices (vgl. Narumoto \cite{ApiDesignBestPractices})
 und aufgrund von potentiell hoher Datenmenge unterstützt der Endpunkt
 pagination. Durch setzen von limit und offset kann so gesteuert werden
 wieviele und welche Teile der Vektor Daten zurückgegeben werden.
@@ -520,9 +520,9 @@ zusätzlich gefiltert werden. Dies geschieht in der Engine Klasse.
 	\label{tab:EndpointQueryParameters}
 \end{table}
 
-Die DefaultEngine Klasse Implementiert, das IDefaultEngine Interface
-und mit Ihr auch die Methoden GetAllVectors, GetVectorMetaData,
-und FilterVectors. Sie bezieht die AppSettings des Programms via
+Die \texttt{DefaultEngine} Klasse Implementiert, das \texttt{IDefaultEngine} Interface
+und mit Ihr auch die Methoden \texttt{GetAllVectors()}, \texttt{GetVectorMetaData()},
+und \texttt{FilterVectors()}. Sie bezieht die \texttt{AppSettings} des Programms via
 Dependency Injection (vgl. Code \ref{code:DefaultEngineConstructor}).
 
 \begin{codeblock}
@@ -540,16 +540,16 @@ public DefaultEngineV2(IOptions<AppSettings> settings)
 	\end{lstlisting}
 \end{codeblock}
 
-Dieses Settings Objekt ist erforderlich, da es den Pfad zu der Datei
+Dieses Settings-Objekt ist erforderlich, da es den Pfad zu der Datei
 beinhaltet, welche die Vektordaten enthält. Diese Datei muss eine JSON
 Datei sein, welche aus einem Array mit Vektorobjekten besteht.
 Der Aufbau ist hier der Selbe, wie die JSON Antworten des Backends
 (siehe Code \ref{code:VecJSON}). Dieser Pfad wird von der Methode
-\grqq GetAllVectors\grqq\space an die private Methode
-\grqq LoadVectorsFromJsonFile\grqq\space weitergegeben, welche wiederum
-mithilfe des \grqq StreamReaders\grqq\space zunächst die Datei einliest
-und ansachließend mit \grqq JsonConvert\grqq\space in eine Liste an
-VectorDto Objekten paarst. (vgl. Code \ref{code:GetAllVectors})
+\texttt{GetAllVectors()} an die private Methode
+\texttt{LoadVectorsFromJsonFile()} weitergegeben, welche wiederum
+mithilfe des \texttt{StreamReaders} zunächst die Datei einliest
+und ansachließend mit \texttt{JsonConvert} in eine Liste an
+\texttt{VectorDto} Objekten parst. (vgl. Code \ref{code:GetAllVectors})
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -577,21 +577,21 @@ public List<VectorDto> GetAllVectors()
 	\end{lstlisting}
 \end{codeblock}
 
-Diese Funktionen werden auch von \grqq GetVectorMetaData\grqq\space
+Diese Funktionen werden auch von \texttt{GetVectorMetaData}
 aufgerufen, welche dann jeweils die x,y und z Minima und Maxima und
 die Anzahl an Vektoren ermittelt ermittelt. Diese werden dann als
-\grqq VectorDataMetaData\grqq\space zurückgegeben.
+\texttt{VectorDataMetaData} zurückgegeben.
 
-Die Engine Klasse stellt auch eine FilterVectors Methode zur Verfügung.
-Die Methode nimmt einen ein plainVectorDto Objekt, die maximale Distanz
+Die Engine Klasse stellt auch eine \texttt{FilterVectors()} Methode zur Verfügung.
+Die Methode nimmt ein \texttt{VectorDto} Objekt als Ebenen-Vektor, die maximale Distanz
 und die zu filternden Vektoren entgegen. Um die Distanz von einem Punkt
 zu einer Ebene zu ermitteln muss zunächst die Ebene in Koordinatenform
 ($n1 \cdot x + n2 \cdot y + n3 \cdot z = c$) angegeben werden können.
-Hierfür muss nur noch c ermittelt werden, was durch einsetzen der Werte
+Hierfür muss c ermittelt werden, was durch einsetzen der Werte
 errechnet werden kann. Anschließend wird für jeden Punkt die Distanz
-mit der Formel $d = \frac{n1 \cdot x + n2 \cdot y + n3 \cdot z - c}{\sqrt{n1^2 + n2^2 + n3^2}}$.
+mit der Formel $d = \frac{n1 \cdot x + n2 \cdot y + n3 \cdot z - c}{\sqrt{n1^2 + n2^2 + n3^2}}$ ermittelt.
 Diese Distanz wird mit der maximalen Distanz verglichen und der Vektor
-wird nur dann zurückgegeben, wenn diese kleiner oder gleich ist
+wird nur dann mit zurückgegeben, wenn dieser kleiner oder gleich ist dem spezifizierten Wert ist.
 (vgl. Code \ref{code:FilterVectors}).
 
 \begin{codeblock}
@@ -627,7 +627,7 @@ Daher wurden die Vektordaten ursprünglich durch ein Gravitation Modell
 simuliert. Auf diese Simulation wird in der Arbeit nicht weiter
 eingegangen.
 
-Das Backend wurde mit der Vektordaten Simulierung zu Testzwecken während
+Das Backend wurde außerdem mit der Vektordaten Simulierung zu Testzwecken während
 der Entwicklung in einem Azure Webservice gehostet.
 
 %\begin{itemize}
