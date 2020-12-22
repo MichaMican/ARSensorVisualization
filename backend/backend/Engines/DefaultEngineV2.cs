@@ -38,7 +38,7 @@ namespace backend.Controllers.Engines
             return LoadVectorsFromJsonFile(_settings.jsonPath);
         }
 
-        public VectorDataMetaData GetVectorMetaData()
+        public VectorDataMetaDataDto GetVectorMetaData()
         {
             var vectors = GetAllVectors();
             var xMin = vectors.Min((v) => v.x);
@@ -49,7 +49,7 @@ namespace backend.Controllers.Engines
             var zMax = vectors.Max((v) => v.z);
             var totalVectors = vectors.Count;
 
-            return new VectorDataMetaData()
+            return new VectorDataMetaDataDto()
             {
                 totalVecotrs = totalVectors,
                 xMin = xMin,

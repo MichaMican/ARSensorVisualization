@@ -21,7 +21,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("data/meta")]
-        public ActionResult<VectorDataMetaData> GetVectorMetaData()
+        public ActionResult<VectorDataMetaDataDto> GetVectorMetaData()
         {
             return _engine.GetVectorMetaData();
         }

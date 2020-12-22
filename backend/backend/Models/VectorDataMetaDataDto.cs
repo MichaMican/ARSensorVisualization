@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace backend.Models
 {
-    public class VectorDataMetaData
+    public class VectorDataMetaDataDto
     {
         public int totalVecotrs { get; set; }
         public double xMin { get; set; }

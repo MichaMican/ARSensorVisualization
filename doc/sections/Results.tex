@@ -308,13 +308,6 @@ setInterval(async () => { @\label{line:DataUpdateStart}@
 \FloatBarrier
 \subsection{Implementierung des Backends}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{images/backend/classDiagram}
-	\caption{System-, Dto-, Controller- und Engine-Klassen}
-	\label{fig:ClassDiagram}
-\end{figure}
-
 Die Backend API ist in Asp.NetCore (C\#) implementiert.
 Das Framework wurde gewählt, da es kostenlos und opensource
 ist und da es sowohl auf Linux als auch auf Windows lauffähig ist
@@ -324,9 +317,16 @@ Funktionalität mit, sodass die API schnell und einfach umzusetzen ist,
 ohne einen großen web hosting Overhead zu erzeugen. Grundsätzlich
 besteht das Programm aus drei Klassen Gruppen, den System-Klassen,
 den Controller-Klassen, den Engine-Klassen und den Data-transfer-object
-Klassen (Dto-Klassen) (siehe Abbildung \ref{fig:ClassDiagram}).
+Klassen (Dto-Klassen) (siehe Abbildung \ref{fig:ClassDiagram}).\\
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{images/backend/classDiagram}
+	\caption{System-, Dto-, Controller- und Engine-Klassen}
+	\label{fig:ClassDiagram}
+\end{figure}
+Die Backend API hat Ihren Einstiegspunkt in der Klasse \texttt{Program}, welche mithilfe der Klasse \texttt{Startup} die Web Applikation beziehungsweise das ganze Programm an sich konfiguriert und startet. Dabei wird die Host IP eingelesen und gesetzt, hierfür wird die Klasse \texttt{ServerSettings} verwendet, welche Ihren Inhalt zur Laufzeit aus der \texttt{appsettings.json} bezieht. Die CORS Policy und der Directory Browser werden ebenso definiert und aktiviert. Zusätzlich werden hier die Abhängigkeiten für das verwendete Dependency Injection (DI) Pattern definiert, welches mithilfe der in ASP.NETCore integrierten Methoden umgesetzt wurde (vgl. Larkin, Smith, Addie, Dahler \cite{Dependen80:online}). Daher ist an vielen Stellen im Code kein expliziter Konstruktor Aufruf zu erkennen. Das Pattern wird verwendet, um ein einfaches Austauschen der Komponenten zu ermöglichen und um das Lifetimemanagement der Abhängigkeitsinstanzen zu vereinfachen. Bei einer HTTP Anfrage wird zur Laufzeit der \texttt{DefaultController} zur Bearbeitung der Anfragen instantiiert. Dieser benutzt Methoden aus der \texttt{DefaultEngineV2}. Die Engine Klasse übernimmt alle Daten bezogenen aufgaben. Sie liest die Vektordaten aus einer JSON Datei aus. Der Pfad zu dieser wird aus dem \texttt{AppSettings} Objekt ausgelesen. Darüber hinaus verfügt die Engine Klasse über eine Filterfunktion, welche Vektordaten nach Überschneidung mit einer Filterebene filtern kann und eine Methode die Meta Informationen, wie die Anzahl und die Minimum und Maximum Werte, über die Vektordaten bereitstellt. Für die Datenbündelung bei der Kommunikation zwischen der Engine und dem Controller werden die Dto-Klassen \texttt{VectorDto} und \texttt{VectorDataMetaDataDto} verwendet. Im folgenden wird der Code der Implementierten Klassen genauer betrachtet.
 
-Die Klasse \texttt{Programm} besitzt von ASP.NET vorgenerierten Code zur Instanziierung
+Die Klasse \texttt{Programm} besitzt von ASP.NET vor generierten Code zur Instanziierung
 des WebHosts. Um Die Host-IP selbst festlegen zu können wurde dieser
 Code um die \texttt{ServerSettings} erweitert, welche die Variable \texttt{HostIp} aus der
 \texttt{apsettings.json} Datei bezieht
@@ -372,10 +372,7 @@ welche das Objekt benötigen. In den Zeilen \ref{line:CorsPolicyStart}
 Die hier definierte Policy wird jede Origin, mit jeder HTTP Methode
 und jedem Header akzeptieren. Außerdem wird in Zeile
 \ref{line:DefaultEngineV2Singleton} eine Instanz von \texttt{DefaultEngineV2}
-als Singleton für IDefaultEngine via Dependancy Injection definiert.
-Dependency Injection wird verwendet, um ein einfaches Austauschen der
-Engine zu ermöglichen und zur Vereinfachung des Lifetimemanagements
-der DefaultEngineV2-Instanz im DefaultController.
+als Singleton für IDefaultEngine via DI definiert.
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -464,7 +461,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 	\label{fig:DirectoryBrowser}
 \end{figure}
 
-Bei der ersten anfrage an die API wird eine Instanz des implementierten
+Bei der ersten Anfrage an die API wird eine Instanz des implementierten
 Controllers erstellt, welche nun die einkommenden Anfragen verarbeitet.
 Der \texttt{DefaultControler} bekommt bei Instanziierung via Dependency Injection
 die vorher in \texttt{ConfigureServices} definierte Instanz einer \texttt{IDefaultEngine}

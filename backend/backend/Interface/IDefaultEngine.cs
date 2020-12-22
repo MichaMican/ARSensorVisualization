@@ -8,7 +8,7 @@ namespace backend.Interface
 {
     public interface IDefaultEngine
     {
-        VectorDataMetaData GetVectorMetaData();
+        VectorDataMetaDataDto GetVectorMetaData();
         List<VectorDto> GetAllVectors();
         List<VectorDto> FilterVectors(List<VectorDto> vectors, VectorDto plainVector, double maxDist);
     }

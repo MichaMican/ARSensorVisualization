@@ -21,11 +21,11 @@
       <FileName>Models\Settings\ServerSettings.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="backend.Models.VectorDataMetaData">
+  <Class Name="backend.Models.VectorDataMetaDataDto">
     <Position X="1.5" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAgAACAAAQAAAgAAgAEAAEAAAAAAAAAAA=</HashCode>
-      <FileName>Models\VectorDataMetaData.cs</FileName>
+      <FileName>Models\VectorDataMetaDataDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="backend.Models.VectorDto">
