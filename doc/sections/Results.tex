@@ -312,22 +312,21 @@ Die Backend API ist in Asp.NetCore (C\#) implementiert.
 Das Framework wurde gewählt, da es kostenlos und opensource
 ist und da es sowohl auf Linux als auch auf Windows lauffähig ist
 (vgl. DotNet Download page \cite{DotNetDownloadPage}).
-Außerdem liefert NetCore mit ASP nativ eine IIS Webapplikation
+Außerdem liefert NetCore mit ASP nativ eine IIS Webapplikations
 Funktionalität mit, sodass die API schnell und einfach umzusetzen ist,
 ohne einen großen web hosting Overhead zu erzeugen. Grundsätzlich
-besteht das Programm aus drei Klassen Gruppen, den System-Klassen,
-den Controller-Klassen, den Engine-Klassen und den Data-transfer-object
-Klassen (Dto-Klassen) (siehe Abbildung \ref{fig:ClassDiagram}).\\
+besteht das Programm aus drei Klassen-Gruppen, den System-Klassen,
+den Controller-Klassen, den Engine-Klassen und den Data-transfer-object-Klassen (Dto-Klassen) (siehe Abbildung \ref{fig:ClassDiagram}).\\
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{images/backend/classDiagram}
 	\caption{System-, Dto-, Controller- und Engine-Klassen}
 	\label{fig:ClassDiagram}
 \end{figure}
-Die Backend API hat Ihren Einstiegspunkt in der Klasse \texttt{Program}, welche mithilfe der Klasse \texttt{Startup} die Web Applikation beziehungsweise das ganze Programm an sich konfiguriert und startet. Dabei wird die Host IP eingelesen und gesetzt, hierfür wird die Klasse \texttt{ServerSettings} verwendet, welche Ihren Inhalt zur Laufzeit aus der \texttt{appsettings.json} bezieht. Die CORS Policy und der Directory Browser werden ebenso definiert und aktiviert. Zusätzlich werden hier die Abhängigkeiten für das verwendete Dependency Injection (DI) Pattern definiert, welches mithilfe der in ASP.NETCore integrierten Methoden umgesetzt wurde (vgl. Larkin, Smith, Addie, Dahler \cite{Dependen80:online}). Daher ist an vielen Stellen im Code kein expliziter Konstruktor Aufruf zu erkennen. Das Pattern wird verwendet, um ein einfaches Austauschen der Komponenten zu ermöglichen und um das Lifetimemanagement der Abhängigkeitsinstanzen zu vereinfachen. Bei einer HTTP Anfrage wird zur Laufzeit der \texttt{DefaultController} zur Bearbeitung der Anfragen instantiiert. Dieser benutzt Methoden aus der \texttt{DefaultEngineV2}. Die Engine Klasse übernimmt alle Daten bezogenen aufgaben. Sie liest die Vektordaten aus einer JSON Datei aus. Der Pfad zu dieser wird aus dem \texttt{AppSettings} Objekt ausgelesen. Darüber hinaus verfügt die Engine Klasse über eine Filterfunktion, welche Vektordaten nach Überschneidung mit einer Filterebene filtern kann und eine Methode die Meta Informationen, wie die Anzahl und die Minimum und Maximum Werte, über die Vektordaten bereitstellt. Für die Datenbündelung bei der Kommunikation zwischen der Engine und dem Controller werden die Dto-Klassen \texttt{VectorDto} und \texttt{VectorDataMetaDataDto} verwendet. Im folgenden wird der Code der Implementierten Klassen genauer betrachtet.
+Die Backend API hat ihren Einstiegspunkt in der Klasse \texttt{Program}, welche mithilfe der Klasse \texttt{Startup} die Web Applikation beziehungsweise das ganze Programm an sich konfiguriert und startet. Dabei wird die Host IP eingelesen und gesetzt, hierfür wird die Klasse \texttt{ServerSettings} verwendet, welche ihren Inhalt zur Laufzeit aus der \texttt{appsettings.json} bezieht. Die CORS Policy und der Directory Browser werden ebenso definiert und aktiviert. Zusätzlich werden hier die Abhängigkeiten für das verwendete Dependency Injection (DI) Pattern definiert, welches mithilfe der in ASP.NETCore integrierten Methoden umgesetzt wurde (vgl. Larkin, Smith, Addie, Dahler \cite{Dependen80:online}). Daher ist an vielen Stellen im Code kein expliziter Konstruktoraufruf zu erkennen. Das Pattern wird verwendet, um ein einfaches Austauschen der Komponenten zu ermöglichen und um das Lifetimemanagement der Abhängigkeitsinstanzen zu vereinfachen. Bei einer HTTP Anfrage wird zur Laufzeit der \texttt{DefaultController} zur Bearbeitung der Anfragen instanziiert. Dieser benutzt Methoden aus der \texttt{DefaultEngineV2}. Die Engine-Klasse übernimmt alle Datenbezogenen Aufgaben. Sie liest die Vektordaten aus einer JSON Datei aus. Der Pfad zu dieser wird aus dem \texttt{AppSettings} Objekt ausgelesen. Darüber hinaus verfügt die Engine-Klasse über eine Filterfunktion, welche Vektordaten nach Überschneidung mit einer Filterebene filtern kann und eine Methode die Meta Informationen, wie die Anzahl und die Minimum- und Maximum-Werte über die Vektordaten bereitstellt. Für die Datenbündelung bei der Kommunikation zwischen der Engine und dem Controller werden die Dto-Klassen \texttt{VectorDto} und \texttt{VectorDataMetaDataDto} verwendet. Im Folgenden wird der Code der implementierten Klassen genauer betrachtet.
 
 Die Klasse \texttt{Programm} besitzt von ASP.NET vor generierten Code zur Instanziierung
-des WebHosts. Um Die Host-IP selbst festlegen zu können wurde dieser
+des WebHosts. Um die Host-IP selbst festlegen zu können wurde dieser
 Code um die \texttt{ServerSettings} erweitert, welche die Variable \texttt{HostIp} aus der
 \texttt{apsettings.json} Datei bezieht
 (Code \ref{code:Program.cs}:\ref{line:SettingsBind}) und im
@@ -360,7 +359,7 @@ public static IHostBuilder CreateHostBuilder(string[] args, ServerSettings serve
 	\end{lstlisting}
 \end{codeblock}
 
-In der zweiten Systemklassen \texttt{Startup.cs} werden die
+In der zweiten Systemklasse \texttt{Startup.cs} werden die
 Webhost und Umgebungseinstellungen getätigt.
 In Code \ref{code:ConfigureServices} Zeile \ref{line:ApplyConfig}
 wird der Teil \texttt{AppSettings} aus der
@@ -408,7 +407,7 @@ Verfügung gestellt. Der zuvor erstellte \texttt{FileExtensionContentTypeProvide
 (Code \ref{code:Configure}:
 \ref{line:FileExtensionContentTypeProviderStart} -
 \ref{line:FileExtensionContentTypeProviderEnd})
-definiert mit welchem Content-Type Header die \grqq unbekannten\grqq\space
+definiert, mit welchem Content-Type Header die \grqq unbekannten\grqq\space
 Datentypen übermittelt werden sollen. Wenn keine eindeutige
 Definition vorliegt wird die Datei mit dem Standard Header
 \grqq text/html\grqq\space nur dann ausgeliefert wenn \texttt{ServeUnknowFileTypes} auf
@@ -488,14 +487,14 @@ public DefaultController(IDefaultEngine engine)
 
 Die Controller Klasse implementiert die in Kapitel \ref{section:Backend}
 definierten per HTTP erreichbaren Endpunkte. \texttt{GetVectorMetaData} bezieht die Metadaten mit einem
-Methoden Aufruf aus der Engine Klasse und gibt diese dann zurück.
+Methodenaufruf aus der Engine-Klasse und gibt diese dann zurück.
 Die \texttt{GetVectorCollection()} Methode akzeptiert 8 optionale Parameter
 (siehe Tabelle \ref{tab:EndpointQueryParameters}). Aufgrund von API
 Design best practices (vgl. Narumoto \cite{ApiDesignBestPractices})
 und aufgrund von potentiell hoher Datenmenge unterstützt der Endpunkt
-pagination. Durch setzen von limit und offset kann so gesteuert werden
-wieviele und welche Teile der Vektor Daten zurückgegeben werden.
-Durch angeben von n1, n2, n3, x, y, und z können die Ergebnisse
+pagination. Durch Setzen von limit und offset kann so gesteuert werden
+wieviele und welche Teile der Vektordaten zurückgegeben werden.
+Durch Angeben von n1, n2, n3, x, y, und z können die Ergebnisse
 zusätzlich gefiltert werden. Dies geschieht in der Engine Klasse.
 
 \begin{table}
@@ -508,16 +507,16 @@ zusätzlich gefiltert werden. Dies geschieht in der Engine Klasse.
 	n1 & x-Koordinate des Normalenvektors der Filter-Ebene & null\\
 	n2 & y-Koordinate des Normalenvektors der Filter-Ebene & null\\
 	n3 & z-Koordinate des Normalenvektors der Filter-Ebene & null\\
-	x & x-Koordinate eines punktes auf der Filter-Ebene & null\\
-	y & y-Koordinate eines punktes auf der Filter-Ebene & null\\
-	z & z-Koordinate eines punktes auf der Filter-Ebene & null\\
+	x & x-Koordinate eines Punktes auf der Filter-Ebene & null\\
+	y & y-Koordinate eines Punktes auf der Filter-Ebene & null\\
+	z & z-Koordinate eines Punktes auf der Filter-Ebene & null\\
 	maxDist & Definiert den maximalen Abstand, den ein Punkt von der Filter-Ebene haben darf um zurückgegeben zu werden & 0.5\\
 	\end{tabular}
 	\caption{Query Parameter des api/data/ Endpunktes}
 	\label{tab:EndpointQueryParameters}
 \end{table}
 
-Die \texttt{DefaultEngine} Klasse Implementiert, das \texttt{IDefaultEngine} Interface
+Die \texttt{DefaultEngine} Klasse implementiert das \texttt{IDefaultEngine} Interface
 und mit Ihr auch die Methoden \texttt{GetAllVectors()}, \texttt{GetVectorMetaData()},
 und \texttt{FilterVectors()}. Sie bezieht die \texttt{AppSettings} des Programms via
 Dependency Injection (vgl. Code \ref{code:DefaultEngineConstructor}).
@@ -540,12 +539,12 @@ public DefaultEngineV2(IOptions<AppSettings> settings)
 Dieses Settings-Objekt ist erforderlich, da es den Pfad zu der Datei
 beinhaltet, welche die Vektordaten enthält. Diese Datei muss eine JSON
 Datei sein, welche aus einem Array mit Vektorobjekten besteht.
-Der Aufbau ist hier der Selbe, wie die JSON Antworten des Backends
+Der Aufbau ist hier derselbe, wie die JSON Antworten des Backends
 (siehe Code \ref{code:VecJSON}). Dieser Pfad wird von der Methode
 \texttt{GetAllVectors()} an die private Methode
 \texttt{LoadVectorsFromJsonFile()} weitergegeben, welche wiederum
 mithilfe des \texttt{StreamReaders} zunächst die Datei einliest
-und ansachließend mit \texttt{JsonConvert} in eine Liste an
+und anschließend mit \texttt{JsonConvert} in eine Liste an
 \texttt{VectorDto} Objekten parst. (vgl. Code \ref{code:GetAllVectors})
 
 \begin{codeblock}
@@ -576,19 +575,19 @@ public List<VectorDto> GetAllVectors()
 
 Diese Funktionen werden auch von \texttt{GetVectorMetaData}
 aufgerufen, welche dann jeweils die x,y und z Minima und Maxima und
-die Anzahl an Vektoren ermittelt ermittelt. Diese werden dann als
+die Anzahl an Vektoren ermittelt. Diese werden dann als
 \texttt{VectorDataMetaData} zurückgegeben.
 
-Die Engine Klasse stellt auch eine \texttt{FilterVectors()} Methode zur Verfügung.
-Die Methode nimmt ein \texttt{VectorDto} Objekt als Ebenen-Vektor, die maximale Distanz
+Die Engine-Klasse stellt auch eine \texttt{FilterVectors()} Methode zur Verfügung.
+Die Methode nimmt ein \texttt{VectorDto} Objekt als Ebenenvektor, die maximale Distanz
 und die zu filternden Vektoren entgegen. Um die Distanz von einem Punkt
-zu einer Ebene zu ermitteln muss zunächst die Ebene in Koordinatenform
+zu einer Ebene zu ermitteln, muss zunächst die Ebene in Koordinatenform
 ($n1 \cdot x + n2 \cdot y + n3 \cdot z = c$) angegeben werden können.
 Hierfür muss c ermittelt werden, was durch einsetzen der Werte
 errechnet werden kann. Anschließend wird für jeden Punkt die Distanz
 mit der Formel $d = \frac{n1 \cdot x + n2 \cdot y + n3 \cdot z - c}{\sqrt{n1^2 + n2^2 + n3^2}}$ ermittelt.
 Diese Distanz wird mit der maximalen Distanz verglichen und der Vektor
-wird nur dann mit zurückgegeben, wenn dieser kleiner oder gleich ist dem spezifizierten Wert ist.
+wird nur dann mit zurückgegeben, wenn dieser kleiner oder gleich dem spezifizierten Wert ist.
 (vgl. Code \ref{code:FilterVectors}).
 
 \begin{codeblock}
@@ -619,8 +618,8 @@ public List<VectorDto> FilterVectors(List<VectorDto> vectors, VectorDto plainVec
 	\end{lstlisting}
 \end{codeblock}
 
-Während der Entwicklung, waren zunächst keine Daten verfügbar.
-Daher wurden die Vektordaten ursprünglich durch ein Gravitation Modell
+Während der Entwicklung waren zunächst keine Daten verfügbar.
+Daher wurden die Vektordaten ursprünglich durch ein Gravitationsmodell
 simuliert. Auf diese Simulation wird in der Arbeit nicht weiter
 eingegangen.
 
