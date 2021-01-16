@@ -51,8 +51,8 @@ export default {
 	): Promise<Array<Line3>> {
 		const url = new URL(this.data)
 		url.searchParams.append('limit', limit.toString())
-		if (x || y || n1 || n2 || n3) {
-			if (x && y && z && n1 && n2 && n3) {
+		if (x !== undefined || y !== undefined || z !== undefined || n1 !== undefined || n2 !== undefined || n3 !== undefined) {
+			if (x !== undefined && y !== undefined && z !== undefined && n1 !== undefined && n2 !== undefined && n3 !== undefined) {
 				url.searchParams.append('x', x.toString())
 				url.searchParams.append('y', y.toString())
 				url.searchParams.append('z', z.toString())
