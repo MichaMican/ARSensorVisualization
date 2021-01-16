@@ -1,5 +1,5 @@
 import GUI from './gui'
-
+import { isDataMetaDat as isMetaData } from './MetaData'
 import Backend from './backend'
 
 import {
@@ -21,8 +21,8 @@ import {
 } from './ThreeUtil'
 
 import { ArWrapper } from './ArWrapper'
-import {getLineLength, Line3} from './Data3D'
-import {Lut} from "three/examples/jsm/math/Lut";
+import { getLineLength, Line3 } from './Data3D'
+import { Lut } from "three/examples/jsm/math/Lut";
 
 
 function createArrowCloud(
@@ -140,22 +140,26 @@ function moveArrowToLine(arrow: Arrow, line: Line3) {
 	})
 }
 
-setInterval(async () => {
+Backend.getMetaData().then(metaData => {
+	setInterval(async () => {
+		if (gui.filterEnabled) {
+			const plain = gui.filterPlain
 
-	if (gui.filterEnabled) {
-		const plain = gui.filterPlain
+			lines = await Backend.getVectorData(
+				metaData.totalVectors,
+				plain.x,
+				plain.y,
+				plain.z,
+				plain.nVector.x,
+				plain.nVector.y,
+				plain.nVector.z
+			)
+		} else {
+			lines = await Backend.getVectorData(metaData.totalVectors);
+		}
+	}, 500)
+}).catch((e) => {
+	console.error(e);
+})
 
-		lines = await Backend.getVectorData(
-			plain.x,
-			plain.y,
-			plain.z,
-			plain.nVector.x,
-			plain.nVector.y,
-			plain.nVector.z
-		)
-	} else {
-		lines = await Backend.getAllVectorData();
-	}
 
-
-}, 500)
