@@ -116,5 +116,10 @@ namespace backend.Controllers.Engines
             return vectors.Where((v) => GetDistanceVectorBasePlain(n1, n2, n3, c, v) <= maxDist).ToList();
 
         }
+
+        public VectorDataMetaData GetVectorMetaData()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

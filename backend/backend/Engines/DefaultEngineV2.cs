@@ -51,7 +51,7 @@ namespace backend.Controllers.Engines
 
             return new VectorDataMetaDataDto()
             {
-                totalVecotrs = totalVectors,
+                totalVectors = totalVectors,
                 xMin = xMin,
                 yMin = yMin,
                 zMin = zMin,

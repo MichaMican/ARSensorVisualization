@@ -15,7 +15,7 @@ export async function getFromURL<T>(
 			}
 		}
 	} catch (e) {
-		error = e
+		error = e 
 	}
 	
 	if (onError && onError != 'throw') {

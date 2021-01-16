@@ -7,7 +7,7 @@ namespace backend.Models
 {
     public class VectorDataMetaDataDto
     {
-        public int totalVecotrs { get; set; }
+        public int totalVectors { get; set; }
         public double xMin { get; set; }
         public double yMin { get; set; }
         public double zMin { get; set; }
