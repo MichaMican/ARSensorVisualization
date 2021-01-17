@@ -4,7 +4,7 @@
 \subsection{Implementierung des Frontends}
 
 Da die Frontend Applikation auf JavaScript Bibliotheken aufbaut,
-ist es Notwendig mit JavaScript Interoperabilität zu bewahren.
+ist es notwendig, im Projekt JavaScript Code aufrufen, zu können.
 Um das zu bewerkstelligen, wird eine Programmiersprache genutzt,
 welche auf JavaScript transpiled wird. TypeScript ist ein
 Superset von JavaScript, mit der Möglichkeit Typsicherheit bei
@@ -14,7 +14,7 @@ erweitert werden. Solche Typ-Header sind für viele Bibliotheken
 bereits verfügbar (vgl. DefinitelyTyped \cite{DefinitelyTyped}),
 wie es für \grqq Three.js\grqq\space auch der Fall ist. Für
 \grqq AR.js\grqq\space wird ein eigener Header mit Hilfe des
-Quellcodes angelegt (Code \ref{code:ARjsHeader}).
+Quellcodes angelegt (\lstlistingname\space \ref{code:ARjsHeader}).
 
 \bigskip
 
@@ -31,7 +31,7 @@ Bibliotheken beim Bauen eines Projektes zu verwalten, was von
 TypeScript vorausgesetzt wird, um auf deren Header zuzugreifen.
 Es wird \grqq Three.js\grqq\space aus dem offiziellen Verzeichnis
 bezogen, und \grqq AR.js\grqq\space aus einem stabilen Branch des
-GitHub Repositorys (siehe Code \ref{code:PackageJSON}, Zeilen
+GitHub Repositorys (siehe \lstlistingname\space \ref{code:PackageJSON}, Zeilen
 \ref{line:DependenciesStart} - \ref{line:DependenciesEnd}).
 
 \begin{codefloat}
@@ -69,22 +69,22 @@ GitHub Repositorys (siehe Code \ref{code:PackageJSON}, Zeilen
 
 Durch npm werden des weiteren Entwicklungswerkzeuge genutzt, die das
 Transpilen von TypeScript, Testen der Website, und Packen der Website
-vereinfachen (siehe Code \ref{code:PackageJSON}, Zeilen
+vereinfachen (siehe \lstlistingname\space \ref{code:PackageJSON}, Zeilen
 \ref{line:ScriptsStart} - \ref{line:ScriptsEnd} und
 \ref{line:DevDependenciesStart} - \ref{line:DevDependenciesEnd}).
 Eines dieser Werkzeuge ist \grqq webpack\grqq . Es erlaubt, für eine
 Website, den Quellcode zu einer Datei zu packen, um bei komplexer
 Abhängigkeitsstruktur die Quelldateien nicht einzeln zur
-ausgelieferten Website hinzufügen zu müssen.
+ausgelieferten Website hinzufügen zu müssen (vgl. Sean Larkin et al. \cite{Webpack}).
 Bei \grqq webpack\grqq\space wird von einem einheitlichen Importierschema
 ausgegangen. Da \grqq AR.js\grqq\space kein Export-Schema nutzt, sondern
 seine Werte direkt in den globalen Scope schreibt, muss der Quellcode
 modifiziert werden, um zu spezifizieren, welche Werte exportiert werden
 sollen. Es wird die globale Variable \texttt{THREEx} als Standardexport
-festgelegt (Code \ref{code:WebpackTHREExExport}). Des weiteren werden
+festgelegt (\lstlistingname\space \ref{code:WebpackTHREExExport}). Des weiteren werden
 auch Werte, die von \grqq AR.js\grqq\space erwartet werden, dem Code
 zur Verfügung gestellt. Dies beschränkt sich auf den Standardexport von
-\grqq Three.js\grqq\space (Code \ref{code:WebpackTHREEProvider}).
+\grqq Three.js\grqq\space (\lstlistingname\space \ref{code:WebpackTHREEProvider}).
 
 \bigskip
 
@@ -112,26 +112,108 @@ zur Verfügung gestellt. Dies beschränkt sich auf den Standardexport von
 	firstnumber=46,
 ]{../frontend/webpack.config.js}
 
-Um das Frontend zu initialisieren, wird der Kommandozeilenbefehl
-\texttt{npm install} genutzt. Dieser überprüft die existierenden
-Module auf dem System, und installiert fehlende, in das
-Unterverzeichnis \verb|node_modules/|.
-Um das Projekt zu bauen, wird der Kommandozeilenbefehl
-\texttt{npm run-script build} genutzt, welcher in dem Unterverzeichnis
-\verb|out/| alle auszuliefernden Dateien erzeugt.
+Die AR-Funktionalität der Bibliothek \grqq AR.js\grqq\space wird in einer
+wrapper Klasse namens \texttt{ArWrapper}, zur vereinfachten Nutzung,
+umhüllt (siehe \lstlistingname\space \ref{code:ArWrapper}).
+Diese kümmert sich um das Einbinden und die Darstellung des Kamerabildes
+und sie passt den \grqq AR-Marker Controller\grqq\space
+(siehe Abbildung \ref{fig:SceneTree}) an die Position und Rotation des
+AR-Markers (siehe Kapitel \ref{section:Frontend}) im Kamerabild an.
+Bei der Nutzung davon, muss vor der Berechnung eines neuen Frames
+die \texttt{update} Methode (siehe \lstlistingname\space \ref{code:ArWrapper},
+Zeilen \ref{line:UpdateArWrapperStart} - \ref{line:UpdateArWrapperEnd})
+aufgerufen werden. Er passt bei Initialisierung die Projektionsmatrix der
+virtuellen Kamera, an die der echten Kamera an (siehe \lstlistingname\space
+\ref{code:ArWrapper}, Zeilen \ref{line:CameraParameters} und
+\ref{line:ArContextInitStart} - \ref{line:ArContextInitEnd}).
+Gesuchte Marker können von dem Wrapper über die \texttt{createMarkerRoot}
+Methode angefragt werden (siehe \lstlistingname\space
+\ref{code:ArWrapper}, Zeilen \ref{line:CreateMarkerStart} -
+\ref{line:CreateMarkerEnd}).
 
-Für die AR-Funktionalität wird ein Wrapper um \grqq AR.js\grqq\space
-entwickelt, welcher die Kamera einbindet, und darstellt, und den
-Virtuellen Marker anpasst. Er erwartet vor der Berechnung eines
-neuen Frames den Aufruf der \texttt{update} Methode, und bei
-Größenänderungen des Anzeigebereichs, den Aufruf der \texttt{updateSize}
-Methode. Er passt bei Initialisierung die Projektionsmatrix der
-virtuellen Kamera, an die der echten Kamera an. Gesuchte Marker
-können von dem Wrapper über die \texttt{createMarkerRoot} Methode
-angefragt werden.
+\bigskip
 
-Code \ref{code:FrontendMain} zeigt die Arbeitsschritte bei der
-Initialisierung des Frontends. Es wird ein Wrapper zur Nutzeroberfläche
+\begin{lstlisting}[
+		language=TypeScript,
+		caption={Wrapper-Klasse um die Bibliothek \grqq AR.js\grqq },
+		label={code:ArWrapper},
+		firstnumber=13,
+		escapechar=|
+	]
+export class ArWrapper {
+	private readonly arSource: ArSource
+	private readonly arContext: ArContext
+
+	constructor(
+		readonly renderer: Renderer,
+		camera: Camera,
+		cameraParametersUrl: String
+	) {
+		// Create ArSource
+		this.arSource = new ArSource({
+			sourceType : 'webcam'
+		})
+
+		// Create ArContext
+		this.arContext = new ArContext({
+			cameraParametersUrl: cameraParametersUrl, |\label{line:CameraParameters}|
+			detectionMode: 'mono'
+		})
+		
+		// Copy projection matrix to camera when initialization complete
+		this.arContext.init(() => { |\label{line:ArContextInitStart}|
+			camera.projectionMatrix.copy(this.arContext.getProjectionMatrix())
+		}) |\label{line:ArContextInitEnd}|
+		
+		// Init ArSource and update DOM element sizes
+		this.arSource.init(() => {
+			// Give elements time to initialize
+			setTimeout(() => this.updateSize(), 2000)
+		})
+
+		// Handle window resize
+		window.addEventListener('resize', () => this.updateSize())
+	}
+	|\pagebreak |
+	updateSize() {
+		this.arSource.onResizeElement()
+		this.arSource.copyElementSizeTo(this.renderer.domElement)
+		if (this.arContext.arController) {
+			this.arSource.copyElementSizeTo(this.arContext.arController.canvas)
+		}
+	}
+
+	update() { |\label{line:UpdateArWrapperStart}|
+		if (this.arSource.ready && this.arSource.domElement) {
+			this.arContext.update(this.arSource.domElement)
+		}
+	} |\label{line:UpdateArWrapperEnd}|
+
+	private attachMarkerControls(
+		markerRoot: Object3D,
+		patternUrl: String
+	): ArMarkerControls {
+		return new ArMarkerControls(this.arContext, markerRoot, {
+			type: 'pattern',
+			patternUrl: patternUrl
+		})
+	}
+	
+	createMarkerRoot(parent: Object3D, patternUrl: String): Group { |\label{line:CreateMarkerStart}|
+		const markerRoot = new Group()
+		parent.add(markerRoot)
+
+		this.attachMarkerControls(markerRoot, patternUrl)
+	
+		return markerRoot
+	} |\label{line:CreateMarkerEnd}|
+}
+	\end{lstlisting}
+
+\pagebreak
+
+\lstlistingname\space \ref{code:FrontendMain} zeigt die Arbeitsschritte bei der
+Initialisierung des Frontends. Es wird der Wrapper der Nutzeroberfläche
 instanziert, und dann werden Szene, Kamera und Renderer für die
 3D Visualisierung angelegt. Damit wird ein \texttt{ArWrapper}
 erstellt, der einen virtuellen Marker zur Verfügung stellt.
@@ -143,6 +225,29 @@ welche unsichtbar sind, bis sie an Daten angepasst werden.
 In Zeilen \ref{line:KokilleStart} - \ref{line:KokilleEnd} wird
 asynchron das Referenzmodell geladen, und, relativ zum
 logischen Weltursprung der Echtwelt transformiert.
+
+\lstlistingname\space \ref{code:FrontendUpdate} zeigt die Arbeitsschritte um das Frontend
+zu aktualisieren. Dies geschieht auf zwei Weisen. Einerseits werden für
+jeden Frame lokale Berechnungen getätigt (Zeilen \ref{line:RunFunStart} -
+\ref{line:RunBlockEnd}), andererseits werden in einem Intervall von
+\texttt{500ms} neue Daten vom Backend angefragt (Zeilen
+\ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd}).
+Die \texttt{run} Funktion (Zeilen \ref{line:RunFunStart} -
+\ref{line:RunFunEnd}) erhält beim ausführen ein Callback, welches
+bei jeder Aktualisierung ausgeführt wird, um Daten anzupassen.
+Sie startet eine Kette an Animationsschritten, über die
+\texttt{requestAnimationFrame} Funktion. In diesen Animationsschritten
+wird der \texttt{ArWrapper} Aktualisiert, und das 3D-Bild neu gezeichnet.
+Das \texttt{updateCallback}, das der \texttt{run} Funktion übergeben
+wird (Zeilen \ref{line:RunBlockStart} - \ref{line:RunBlockEnd}),
+überprüft ob neue Pfeile vom Backend erhalten wurden, und überträgt,
+fallt nötig, die Daten auf die angezeigten Pfeile der zuvor
+erstellten \texttt{arrowCloud}.
+Zeilen \ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd} zeigen die
+Anfrage an das Backend, neue Daten zu senden. Dabei wird überprüft,
+ob ein Filter im Frontend eingestellt wurde, der die angezeigten
+Pfeile beschränkt. Ist dies der Fall, werden die Filterdaten der
+Anfrage beigelegt.
 
 \begin{codefloat}
 	\begin{lstlisting}[
@@ -184,29 +289,6 @@ loadModel(
 ) @\label{line:KokilleEnd}@
 	\end{lstlisting}
 \end{codefloat}
-
-Code \ref{code:FrontendUpdate} zeigt die Arbeitsschritte um das Frontend
-zu Aktualisieren. Dies geschieht auf zwei Weisen. Einerseits werden
-jeden Frame lokale Berechnungen getätigt (Zeilen \ref{line:RunFunStart} -
-\ref{line:RunBlockEnd}), andererseits werden in einem Intervall von
-\texttt{500ms} neue Daten vom Backend angefragt (Zeilen
-\ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd}).
-Die \texttt{run} Funktion (Zeilen \ref{line:RunFunStart} -
-\ref{line:RunFunEnd}) erhält beim ausführen ein Callback, welches
-bei jeder Aktualisierung ausgeführt wird, um Daten anzupassen.
-Sie startet eine Kette an Animationsschritten, über die
-\texttt{requestAnimationFrame} Funktion. In diesen Animationsschritten
-wird der \texttt{ArWrapper} Aktualisiert, und das 3D-Bild neu gezeichnet.
-Das \texttt{updateCallback}, das der \texttt{run} Funktion übergeben
-wird (Zeilen \ref{line:RunBlockStart} - \ref{line:RunBlockEnd}),
-überprüft ob neue Pfeile vom Backend erhalten wurden, und überträgt,
-fallt nötig, die Daten auf die angezeigten Pfeile der zuvor
-erstellten \texttt{arrowCloud}.
-Zeilen \ref{line:DataUpdateStart} - \ref{line:DataUpdateEnd} zeigen die
-Anfrage an das Backend, neue Daten zu senden. Dabei wird überprüft,
-ob ein Filter im Frontend eingestellt wurde, der die angezeigten
-Pfeile beschränkt. Ist dies der Fall, werden die Filterdaten der
-Anfrage beigelegt.
 
 \begin{codefloat}
 	\begin{lstlisting}[
@@ -329,9 +411,9 @@ Die Klasse \texttt{Programm} besitzt von ASP.NET vor generierten Code zur Instan
 des WebHosts. Um die Host-IP selbst festlegen zu können wurde dieser
 Code um die \texttt{ServerSettings} erweitert, welche die Variable \texttt{HostIp} aus der
 \texttt{apsettings.json} Datei bezieht
-(Code \ref{code:Program.cs}:\ref{line:SettingsBind}) und im
+(\lstlistingname\space \ref{code:Program.cs}:\ref{line:SettingsBind}) und im
 \texttt{CreateHostBuilder} diese als Host-URL verwendet
-(Code \ref{code:Program.cs}:\ref{line:HostURL}).
+(\lstlistingname\space \ref{code:Program.cs}:\ref{line:HostURL}).
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -361,7 +443,7 @@ public static IHostBuilder CreateHostBuilder(string[] args, ServerSettings serve
 
 In der zweiten Systemklasse \texttt{Startup.cs} werden die
 Webhost und Umgebungseinstellungen getätigt.
-In Code \ref{code:ConfigureServices} Zeile \ref{line:ApplyConfig}
+In \lstlistingname\space \ref{code:ConfigureServices} Zeile \ref{line:ApplyConfig}
 wird der Teil \texttt{AppSettings} aus der
 \texttt{appsettings.json} ausgelesen und in die Dto Klasse
 \texttt{AppSettings} geparsed. Diese Instanz wird dann später
@@ -395,8 +477,8 @@ public void ConfigureServices(IServiceCollection services)
 \end{codeblock}
 
 Diese Methode wird zu Laufzeit vor \texttt{Configure}
-(Code \ref{code:Configure}) aufgerufen. In \texttt{Configure} werden nun
-einige wichtige Einstellungen getätigt. In Code \ref{code:Configure}
+(\lstlistingname\space \ref{code:Configure}) aufgerufen. In \texttt{Configure} werden nun
+einige wichtige Einstellungen getätigt. In \lstlistingname\space \ref{code:Configure}
 Zeile \ref{line:UseCors} wird die vorher in \texttt{ConfigureServices} definierte
 \grqq AllowAnyOrigin\grqq -Policy für die ganze WebApp übernommen.
 In den Zeilen \ref{line:StaticFilesStart} - \ref{line:StaticFilesEnd}
@@ -404,7 +486,7 @@ wird eingestellt welche statischen Dateien gehostet werden sollen,
 wo diese liegen und wo diese aufzufinden sein sollen. So wird nun
 der gesamte Inhalt des Ordners \texttt{wwwroot} am \texttt{/data} Endpunkt zur
 Verfügung gestellt. Der zuvor erstellte \texttt{FileExtensionContentTypeProvider}
-(Code \ref{code:Configure}:
+(\lstlistingname\space \ref{code:Configure}:
 \ref{line:FileExtensionContentTypeProviderStart} -
 \ref{line:FileExtensionContentTypeProviderEnd})
 definiert, mit welchem Content-Type Header die \grqq unbekannten\grqq\space
@@ -465,7 +547,7 @@ Controllers erstellt, welche nun die einkommenden Anfragen verarbeitet.
 Der \texttt{DefaultControler} bekommt bei Instanziierung via Dependency Injection
 die vorher in \texttt{ConfigureServices} definierte Instanz einer \texttt{IDefaultEngine}
 Interface implementierenden Klasse
-(vgl. Code \ref{code:DefaultControllerConstructor}).
+(vgl. \lstlistingname\space \ref{code:DefaultControllerConstructor}).
 Diese Aufteilung in Controller und Engine wurde definiert um eine besser
 Codeübersicht zu gewährleisten. So ist die input verarbeitende Controller
 Klasse von der Datenverarbeitenden Engine Klasse losgelöst, ähnlich dem MVC-Modell.
@@ -519,7 +601,7 @@ zusätzlich gefiltert werden. Dies geschieht in der Engine Klasse.
 Die \texttt{DefaultEngine} Klasse implementiert das \texttt{IDefaultEngine} Interface
 und mit Ihr auch die Methoden \texttt{GetAllVectors()}, \texttt{GetVectorMetaData()},
 und \texttt{FilterVectors()}. Sie bezieht die \texttt{AppSettings} des Programms via
-Dependency Injection (vgl. Code \ref{code:DefaultEngineConstructor}).
+Dependency Injection (vgl. \lstlistingname\space \ref{code:DefaultEngineConstructor}).
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -540,12 +622,12 @@ Dieses Settings-Objekt ist erforderlich, da es den Pfad zu der Datei
 beinhaltet, welche die Vektordaten enthält. Diese Datei muss eine JSON
 Datei sein, welche aus einem Array mit Vektorobjekten besteht.
 Der Aufbau ist hier derselbe, wie die JSON Antworten des Backends
-(siehe Code \ref{code:VecJSON}). Dieser Pfad wird von der Methode
+(siehe \lstlistingname\space \ref{code:VecJSON}). Dieser Pfad wird von der Methode
 \texttt{GetAllVectors()} an die private Methode
 \texttt{LoadVectorsFromJsonFile()} weitergegeben, welche wiederum
 mithilfe des \texttt{StreamReaders} zunächst die Datei einliest
 und anschließend mit \texttt{JsonConvert} in eine Liste an
-\texttt{VectorDto} Objekten parst. (vgl. Code \ref{code:GetAllVectors})
+\texttt{VectorDto} Objekten parst. (vgl. \lstlistingname\space \ref{code:GetAllVectors})
 
 \begin{codeblock}
 	\begin{lstlisting}[
@@ -588,7 +670,7 @@ errechnet werden kann. Anschließend wird für jeden Punkt die Distanz
 mit der Formel $d = \frac{n1 \cdot x + n2 \cdot y + n3 \cdot z - c}{\sqrt{n1^2 + n2^2 + n3^2}}$ ermittelt.
 Diese Distanz wird mit der maximalen Distanz verglichen und der Vektor
 wird nur dann mit zurückgegeben, wenn dieser kleiner oder gleich dem spezifizierten Wert ist.
-(vgl. Code \ref{code:FilterVectors}).
+(vgl. \lstlistingname\space \ref{code:FilterVectors}).
 
 \begin{codeblock}
 	\begin{lstlisting}[
