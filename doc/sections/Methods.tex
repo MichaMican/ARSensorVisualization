@@ -29,7 +29,7 @@ Das Kernziel bestand in der Visualisierung von Vektoren im dreidimensionalen Rau
 \subsubsection{Probleme und Abweichungen von den Vorgaben}
 Seit einigen Jahren können sogenannte \grqq Powerful Features\grqq\space nur noch von Seiten mit \grqq Secure origin\grqq , also zertifizierte HTTPS Seiten, genutzt werden. Diese Entscheidung fiel auf Grundlage technischer Fortschritte, die es aus sicherheitsrelevanter Sicht nicht mehr vertretbar machte Funktionen wie beispielsweise Geräteposition und Kamera von klassischen nicht zertifizierten HTTP Seiten zu ermöglichen (vgl. The Chromium Projects \cite{CameraHTTPSOnly}). Die Datenübermittlung, welche von HTTPS genutzt wird, macht es Angreifern schwerer solche kritische Daten abzugreifen. Somit ist es erforderlich eine HTTPS-Webseite für die Applikation zu nutzen. Daher wird die Frontend Seite über Github distributiert, wodurch sie ein HTTPS Zertifikat einer anerkannten Zertifizierungsstelle erwirbt. Diesem vertrauen Webbrowser standardmäßig, wodurch eine manuelle Einstellung am Endgerät nicht getätigt werden muss.\\
 Dieses Vorgehen führt zu einem weiterem Problem. Seit Anfang 2020 ermöglicht es Google Chrome standardmäßig nicht mehr HTTP Quellen auf einer HTTPS-Seite zu benutzen (vgl. Chromium Blog \cite{MixedSourcesPolicy}). Unter Berücksichtigung der Vorgabe des Project Owners, welche die Nutzung eines Datenservers ohne Internetzugang im lokalen Netzwerk vorsieht, ist eine Einstellung am Endgerät unumgänglich. Hierfür gibt es zwei Möglichkeiten.\\
-Einerseits kann, um einen unzertifizierten HTTP Datenserver im lokalen Netzwerk benutzen zu können, die Einstellung \grqq Allow unsecure content\grqq\space in den Browser Einstellungen auf \grqq Allow\grqq\space gesetzt werden. Hierdurch wird die Mixed Content Policy ignoriert und HTTP Quellen können auch auf der Seite benutzt werden. In Chrome Desktop kann diese Option in den Webseiteneinstellungen gefunden werden. Auf einem Smarphone hingegen muss hierfür der interne Settings link \verb|"chrome://flags/#unsafely-treat-insecure-origin-as-secure"| genutzt werden (siehe Abbildung \ref{fig:insecureOriginsSettings}).\\
+Einerseits kann, um einen unzertifizierten HTTP Datenserver im lokalen Netzwerk benutzen zu können, die Einstellung \grqq Allow unsecure content\grqq\space in den Browser Einstellungen auf \grqq Allow\grqq\space gesetzt werden. Hierdurch wird die Mixed Content Policy ignoriert und HTTP Quellen können auch auf der Seite benutzt werden. In Chrome Desktop kann diese Option in den Webseiteneinstellungen gefunden werden. Auf einem Smarphone hingegen muss hierfür der interne Settings link\\\verb|"chrome://flags/#unsafely-treat-insecure-origin-as-secure"| genutzt werden (siehe Abbildung \ref{fig:insecureOriginsSettings}).\\
 Die zweite Möglichkeit das Problem zu lösen erfordert eine eigene definierte HTTPS Zertifizierung des Datenservers. Da diese Zertifizierung nicht via Internet geschehen kann muss hierfür ein eigenes benutzerdefiniertes Zertifikat angelegt und am Endgerät, welches die Website aufruft, als bekanntes Zertifikat installiert werden.\\ 
 Nach Abstimmung mit dem Project Owner wird das Problem bis auf weiteres bei der Entwicklung nicht berücksichtigt. Stattdessen wird sowohl das Frontend als auch das Backend mit simulierten Daten im Internet mit validen HTTPS Zertifikaten gehostet.
 
@@ -66,8 +66,8 @@ Informationen über eine API zur Verfügung stellt.
 
 Um dies zu ermöglichen, wird die Funktionalität auf ihre abstrakten
 Bestandteile reduziert, die dann vom Frontend unterstützt wird.
-Diese Teile sind die Anzeige von einem Vektorfeld, und einem
-3D-Modell der Umgebung, projiziert auf die echte Welt, durch die
+Diese Teile sind die Anzeige von einem Vektorfeld und eines
+3D-Modells der Umgebung, projiziert auf die echte Welt, durch die
 Kamera. Synchronisierung findet hierzu über einen AR-Marker statt.
 Diese Funktionalitäten sind die Voraussetzung, welche jedoch
 erweitert werden, um das Nutzen der Anwendung zu erleichtern.
@@ -208,7 +208,7 @@ da JSON besser für dynamische Webapplikationen und einfachen
 Datentransfer geeignet ist als andere ähnliche Datenformate wie
 XML (vgl. Šimec \cite{comparisonJsonXml}). Die Vektordaten werden
 als Array zurückgegeben. Jedes Vektorobjekt besitzt jeweils eine
-x, y, z, xVec, yVec und zVec Property (Siehe Code \ref{code:VecJSON}).
+x, y, z, xVec, yVec und zVec Property (Siehe \lstlistingname\space \ref{code:VecJSON}).
 Sie definieren den Fußpunkt des Vektors (x, y, z) und die Richtung
 des Vektors (xVec, yVec, zVec).
 
